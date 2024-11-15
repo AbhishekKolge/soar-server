@@ -1,0 +1,16 @@
+{
+  "name": "soar-server",
+  "version": "1.0.0",
+  "description": "Soar is on a mission to help people achieve their financial goals with innovative financial and property investment solutions and tools through its multi-purpose platform, designed to offer a simple and seamless user experience.",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node --watch src/app.js"
+  },
+  "keywords": [
+    "Finance",
+    "Bank"
+  ],
+  "author": "Abhishek Kolge",
+  "license": "ISC"
+}
