@@ -1,0 +1,29 @@
+# Node modules
+node_modules
+
+# Keep environment variables out of version control
+.env
+.env.local
+.env.development.local
+.env.production.local
+
+# Build and output directories
+/build/
+/dist/
+/out/
+
+# Logs
+logs/
+*.log
+*.coverage
+*.test-results/
+
+# Test and coverage reports
+coverage/
+*.lcov
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
