@@ -14,7 +14,15 @@ const {
   errorHandler,
 } = require("./middleware");
 
-const { shutdown, start } = require("./util");
+const {
+  shutdown,
+  start,
+  passport,
+  GOOGLE_SCOPE,
+  GOOGLE_SESSION,
+} = require("./util");
+
+const { authRouter } = require("./route");
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -35,6 +43,8 @@ app.use(
 );
 app.use(morgan("tiny"));
 app.use(rateLimiterSetup);
+
+app.use("/api/v1/auth", authRouter);
 
 app.use(notFound);
 app.use(errorHandler);

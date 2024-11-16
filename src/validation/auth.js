@@ -2,29 +2,38 @@ const Joi = require("joi");
 const { joiContactNo, joiPassword } = require("../util");
 
 const registerSchema = (req, res, next) => {
-  const schema = Joi.object().keys({
-    name: Joi.string().trim().max(50).min(3).required(),
-    username: Joi.string().trim().max(50).min(3).required(),
-    email: Joi.string().trim().email().required(),
-    password: joiPassword
-      .string()
-      .trim()
-      .max(50)
-      .min(8)
-      .minOfLowercase(1)
-      .minOfUppercase(1)
-      .minOfSpecialCharacters(1)
-      .minOfNumeric(1)
-      .noWhiteSpaces()
-      .required(),
-    dob: Joi.date().iso().allow(null).optional(),
-    contactNumber: joiContactNo
-      .string()
-      .phoneNumber({ format: "E.164", strict: false })
-      .allow(null)
-      .optional(),
-    contactCountryId: Joi.string().trim().allow(null).optional(),
-  });
+  const schema = Joi.object()
+    .keys({
+      name: Joi.string().trim().max(50).min(3).required(),
+      username: Joi.string().trim().max(50).min(3).required(),
+      email: Joi.string().trim().email().required(),
+      password: joiPassword
+        .string()
+        .trim()
+        .max(50)
+        .min(8)
+        .minOfLowercase(1)
+        .minOfUppercase(1)
+        .minOfSpecialCharacters(1)
+        .minOfNumeric(1)
+        .noWhiteSpaces()
+        .required(),
+      dob: Joi.date().iso().allow(null).optional(),
+      contactNumber: joiContactNo.string().phoneNumber().allow(null).optional(),
+      contactCountryId: Joi.string().trim().allow(null).optional(),
+    })
+    .when(Joi.object({ contactNumber: Joi.exist() }).unknown(), {
+      then: Joi.object({
+        contactCountryId: Joi.string().trim().required().messages({
+          "any.required": "country code is required",
+        }),
+      }),
+    })
+    .when(Joi.object({ contactCountryId: Joi.exist() }).unknown(), {
+      then: Joi.object({
+        contactNumber: joiContactNo.string().phoneNumber().required(),
+      }),
+    });
 
   req.schema = schema;
 
