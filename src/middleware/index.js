@@ -1,3 +1,4 @@
+const authenticateUser = require("./authentication");
 const corsSetup = require("./cors");
 const errorHandler = require("./error-handler");
 const notFound = require("./not-found");
@@ -12,4 +13,5 @@ module.exports = {
   rateLimiterSetup,
   testUser,
   validateRequest,
+  authenticateUser,
 };
