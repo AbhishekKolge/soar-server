@@ -12,11 +12,11 @@ model User {
   name                        String
   username                    String       @unique
   email                       String       @unique
-  password                    String
+  password                    String?
   dob                         DateTime?    @db.Timestamptz
-  contactNumber               String       @unique
-  contactCountry              Country      @relation(fields: [contactcountryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  contactcountryId            String
+  contactNumber               String?       @unique
+  contactCountry              Country?      @relation(fields: [contactCountryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  contactCountryId            String?
   loginMethod                 LoginMethod
   profileImageUrl             String?
   profileImageId              String?
