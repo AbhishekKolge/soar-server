@@ -6,3 +6,156 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id                          String       @id @default(uuid())
+  name                        String
+  username                    String       @unique
+  email                       String       @unique
+  password                    String
+  dob                         DateTime?    @db.Timestamptz
+  contactNumber               String       @unique
+  contactCountry              Country      @relation(fields: [contactcountryId], references: [id])
+  contactcountryId            String
+  loginMethod                 LoginMethod
+  profileImageUrl             String?
+  profileImageId              String?
+  verificationCode            String?
+  verificationCodeExpiration  DateTime?    @db.Timestamptz
+  isVerified                  Boolean      @default(false)
+  verifiedAt                  DateTime?    @db.Timestamptz
+  resetPasswordCode           String?
+  resetPasswordCodeExpiration DateTime?    @db.Timestamptz
+  isDeleted                   Boolean      @default(false)
+  deletedAt                   DateTime?    @db.Timestamptz
+  createdAt                   DateTime     @default(now()) @db.Timestamptz
+  updatedAt                   DateTime     @updatedAt @db.Timestamptz
+  address                     Address      @relation(fields: [addressId], references: [id])
+  addressId                   String       @unique
+  notification                Notification @relation(fields: [notificationId], references: [id])
+  notificationId              String       @unique
+  security                    Security     @relation(fields: [securityId], references: [id])
+  securityId                  String       @unique
+  cards                       Card[]
+  accounts                    Account[]
+}
+
+model Address {
+  id         String   @id @default(uuid())
+  present    String?
+  permanent  String?
+  city       String?
+  postalCode String?
+  country    Country? @relation(fields: [countryId], references: [id])
+  countryId  String?
+  createdAt  DateTime @default(now()) @db.Timestamptz
+  updatedAt  DateTime @updatedAt @db.Timestamptz
+  user       User?
+}
+
+model Country {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  shortName String    @unique
+  phoneCode String
+  users     User[]
+  addresses Address[]
+}
+
+model Notification {
+  id               String   @id @default(uuid())
+  transactionAlert Boolean  @default(false)
+  loginAlert       Boolean  @default(false)
+  createdAt        DateTime @default(now()) @db.Timestamptz
+  updatedAt        DateTime @updatedAt @db.Timestamptz
+  user             User?
+}
+
+model Security {
+  id            String   @id @default(uuid())
+  twoFactorAuth Boolean  @default(false)
+  createdAt     DateTime @default(now()) @db.Timestamptz
+  updatedAt     DateTime @updatedAt @db.Timestamptz
+  user          User?
+}
+
+model Card {
+  id           String        @id @default(uuid())
+  number       String        @unique
+  name         String
+  isSelected   Boolean       @default(false)
+  validity     DateTime      @db.Timestamptz
+  pin          String
+  isDeleted    Boolean       @default(false)
+  deletedAt    DateTime?     @db.Timestamptz
+  createdAt    DateTime      @default(now()) @db.Timestamptz
+  updatedAt    DateTime      @updatedAt @db.Timestamptz
+  user         User          @relation(fields: [userId], references: [id])
+  userId       String
+  balance      Balance       @relation(fields: [balanceId], references: [id])
+  balanceId    String        @unique
+  transactions Transaction[]
+}
+
+model Balance {
+  id     String @id @default(uuid())
+  amount String
+  card   Card?
+}
+
+model Account {
+  id           String        @id @default(uuid())
+  number       String
+  imageUrl     String?
+  imageId      String?
+  name         String
+  identity     String
+  isDeleted    Boolean       @default(false)
+  deletedAt    DateTime?     @db.Timestamptz
+  createdAt    DateTime      @default(now()) @db.Timestamptz
+  updatedAt    DateTime      @updatedAt @db.Timestamptz
+  user         User          @relation(fields: [userId], references: [id])
+  userId       String
+  bank         Bank          @relation(fields: [bankId], references: [id])
+  bankId       String
+  transactions Transaction[]
+}
+
+model Bank {
+  id       String    @id @default(uuid())
+  name     String
+  logoUrl  String
+  logoId   String
+  accounts Account[]
+}
+
+model Transaction {
+  id        String              @id @default(uuid())
+  method    TransactionMethod
+  amount    String
+  card      Card                @relation(fields: [cardId], references: [id])
+  cardId    String
+  createdAt DateTime            @default(now()) @db.Timestamptz
+  account   Account?            @relation(fields: [accountId], references: [id])
+  accountId String?
+  recipient String?
+  note      String
+  category  TransactionCategory @default(OTHERS)
+}
+
+enum LoginMethod {
+  GOOGLE
+  NORMAL
+}
+
+enum TransactionMethod {
+  DEBIT
+  CREDIT
+}
+
+enum TransactionCategory {
+  ENTERTAINMENT
+  INVESTMENT
+  BILL_EXPENSE
+  OTHERS
+}
