@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 const express = require("express");
-const { shutdown, start } = require("./utils/process");
+const { shutdown, start } = require("./utils");
 
 const app = express();
 
