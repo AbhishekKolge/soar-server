@@ -15,7 +15,7 @@ model User {
   password                    String
   dob                         DateTime?    @db.Timestamptz
   contactNumber               String       @unique
-  contactCountry              Country      @relation(fields: [contactcountryId], references: [id])
+  contactCountry              Country      @relation(fields: [contactcountryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   contactcountryId            String
   loginMethod                 LoginMethod
   profileImageUrl             String?
@@ -30,11 +30,11 @@ model User {
   deletedAt                   DateTime?    @db.Timestamptz
   createdAt                   DateTime     @default(now()) @db.Timestamptz
   updatedAt                   DateTime     @updatedAt @db.Timestamptz
-  address                     Address      @relation(fields: [addressId], references: [id])
+  address                     Address      @relation(fields: [addressId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   addressId                   String       @unique
-  notification                Notification @relation(fields: [notificationId], references: [id])
+  notification                Notification @relation(fields: [notificationId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   notificationId              String       @unique
-  security                    Security     @relation(fields: [securityId], references: [id])
+  security                    Security     @relation(fields: [securityId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   securityId                  String       @unique
   cards                       Card[]
   accounts                    Account[]
@@ -46,7 +46,7 @@ model Address {
   permanent  String?
   city       String?
   postalCode String?
-  country    Country? @relation(fields: [countryId], references: [id])
+  country    Country? @relation(fields: [countryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   countryId  String?
   createdAt  DateTime @default(now()) @db.Timestamptz
   updatedAt  DateTime @updatedAt @db.Timestamptz
@@ -90,9 +90,9 @@ model Card {
   deletedAt    DateTime?     @db.Timestamptz
   createdAt    DateTime      @default(now()) @db.Timestamptz
   updatedAt    DateTime      @updatedAt @db.Timestamptz
-  user         User          @relation(fields: [userId], references: [id])
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId       String
-  balance      Balance       @relation(fields: [balanceId], references: [id])
+  balance      Balance       @relation(fields: [balanceId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   balanceId    String        @unique
   transactions Transaction[]
 }
@@ -109,21 +109,21 @@ model Account {
   imageUrl     String?
   imageId      String?
   name         String
-  identity     String
+  identity     String?
   isDeleted    Boolean       @default(false)
   deletedAt    DateTime?     @db.Timestamptz
   createdAt    DateTime      @default(now()) @db.Timestamptz
   updatedAt    DateTime      @updatedAt @db.Timestamptz
-  user         User          @relation(fields: [userId], references: [id])
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId       String
-  bank         Bank          @relation(fields: [bankId], references: [id])
+  bank         Bank          @relation(fields: [bankId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   bankId       String
   transactions Transaction[]
 }
 
 model Bank {
   id       String    @id @default(uuid())
-  name     String
+  name     String    @unique
   logoUrl  String
   logoId   String
   accounts Account[]
@@ -133,12 +133,12 @@ model Transaction {
   id        String              @id @default(uuid())
   method    TransactionMethod
   amount    String
-  card      Card                @relation(fields: [cardId], references: [id])
+  card      Card                @relation(fields: [cardId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   cardId    String
   createdAt DateTime            @default(now()) @db.Timestamptz
-  account   Account?            @relation(fields: [accountId], references: [id])
+  account   Account?            @relation(fields: [accountId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   accountId String?
-  recipient String?
+  recipient String
   note      String
   category  TransactionCategory @default(OTHERS)
 }
