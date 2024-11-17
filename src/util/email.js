@@ -13,12 +13,12 @@ const sendEmail = async ({ to, subject, html }) => {
   });
 };
 
-const sendResetPasswordEmail = async ({ name, email, passwordCode }) => {
+const sendResetPasswordEmail = async ({ name, email, resetPasswordCode }) => {
   if (!isProductionEnv) {
     return;
   }
 
-  const message = `<p>Your password reset code is ${passwordCode}</p>`;
+  const message = `<p>Your password reset code is ${resetPasswordCode}</p>`;
 
   const html = `<h4>Hello, ${name}</h4> ${message}`;
 

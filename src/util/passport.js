@@ -9,8 +9,13 @@ passport.use(
       callbackURL: process.env.GOOGLE_CALLBACK_URL,
     },
     async (accessToken, refreshToken, profile, done) => {
-      console.log({ profile });
-      done(null);
+      const { name, email, picture } = profile._json;
+      const googleProfile = {
+        name,
+        email,
+        profileImageUrl: picture,
+      };
+      done(null, googleProfile);
     }
   )
 );
