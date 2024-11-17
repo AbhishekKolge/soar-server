@@ -12,11 +12,11 @@ model User {
   name                        String
   username                    String       @unique
   email                       String       @unique
-  password                    String
+  password                    String?
   dob                         DateTime?    @db.Timestamptz
-  contactNumber               String       @unique
-  contactCountry              Country      @relation(fields: [contactcountryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  contactcountryId            String
+  contactNumber               String?       @unique
+  contactCountry              Country?      @relation(fields: [contactCountryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  contactCountryId            String?
   loginMethod                 LoginMethod
   profileImageUrl             String?
   profileImageId              String?
@@ -26,8 +26,6 @@ model User {
   verifiedAt                  DateTime?    @db.Timestamptz
   resetPasswordCode           String?
   resetPasswordCodeExpiration DateTime?    @db.Timestamptz
-  isDeleted                   Boolean      @default(false)
-  deletedAt                   DateTime?    @db.Timestamptz
   createdAt                   DateTime     @default(now()) @db.Timestamptz
   updatedAt                   DateTime     @updatedAt @db.Timestamptz
   address                     Address      @relation(fields: [addressId], references: [id], onDelete: Restrict, onUpdate: Cascade)
@@ -86,8 +84,6 @@ model Card {
   isSelected   Boolean       @default(false)
   validity     DateTime      @db.Timestamptz
   pin          String
-  isDeleted    Boolean       @default(false)
-  deletedAt    DateTime?     @db.Timestamptz
   createdAt    DateTime      @default(now()) @db.Timestamptz
   updatedAt    DateTime      @updatedAt @db.Timestamptz
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -110,8 +106,6 @@ model Account {
   imageId      String?
   name         String
   identity     String?
-  isDeleted    Boolean       @default(false)
-  deletedAt    DateTime?     @db.Timestamptz
   createdAt    DateTime      @default(now()) @db.Timestamptz
   updatedAt    DateTime      @updatedAt @db.Timestamptz
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)

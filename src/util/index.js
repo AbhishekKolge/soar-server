@@ -1,5 +1,12 @@
-const { nodeMailerConfig } = require("./config");
-const { PORT } = require("./default");
+const { nodeMailerConfig, isProductionEnv } = require("./config");
+const {
+  PORT,
+  GOOGLE_SCOPE,
+  GOOGLE_SESSION,
+  LOGIN_METHOD,
+  TRANSACTION_METHOD,
+  TRANSACTION_CATEGORY,
+} = require("./default");
 const {
   sendEmail,
   sendResetPasswordEmail,
@@ -7,6 +14,8 @@ const {
 } = require("./email");
 const { removeQuotes } = require("./format");
 const { hashString, createRandomBytes, createRandomOtp } = require("./hash");
+const { createJWT, isTokenValid, getJWTToken } = require("./jwt");
+const passport = require("./passport");
 const { checkPermissions } = require("./permission");
 const { shutdown, start } = require("./process");
 const {
@@ -15,14 +24,26 @@ const {
   getRequestIp,
   checkTestUser,
 } = require("./request");
-const { currentTime, checkTimeExpired, time } = require("./time");
+const {
+  currentTime,
+  checkTimeExpired,
+  time,
+  getVerificationTimeOffset,
+} = require("./time");
 const { createTokenUser } = require("./user");
+const { joiPassword, joiContactNo } = require("./validation");
 
 module.exports = {
   PORT,
+  GOOGLE_SCOPE,
+  GOOGLE_SESSION,
+  LOGIN_METHOD,
+  TRANSACTION_METHOD,
+  TRANSACTION_CATEGORY,
   shutdown,
   start,
   nodeMailerConfig,
+  isProductionEnv,
   sendEmail,
   sendResetPasswordEmail,
   sendVerificationEmail,
@@ -39,4 +60,11 @@ module.exports = {
   checkTimeExpired,
   time,
   createTokenUser,
+  createJWT,
+  isTokenValid,
+  getJWTToken,
+  passport,
+  joiPassword,
+  joiContactNo,
+  getVerificationTimeOffset,
 };

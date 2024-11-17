@@ -1,4 +1,5 @@
 const rateLimiter = require("express-rate-limit");
+const { isProductionEnv } = require("../util");
 
 const rateLimiterSetup = rateLimiter({
   windowMs: 60 * 1000,
@@ -7,7 +8,7 @@ const rateLimiterSetup = rateLimiter({
   headers: true,
 });
 
-if (process.env.NODE_ENV === "production") {
+if (isProductionEnv) {
   module.exports = rateLimiterSetup;
 } else {
   console.log("Rate limiting is disabled in non-production environment.");
