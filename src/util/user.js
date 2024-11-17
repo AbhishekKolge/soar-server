@@ -1,5 +1,5 @@
-const createTokenUser = ({ id, username, email, profileImageUrl }) => {
-  return { id, username, email, profileImageUrl };
+const createTokenUser = ({ id }) => {
+  return { id };
 };
 
 module.exports = {

@@ -6,12 +6,19 @@ const {
   createRandomOtp,
   sendVerificationEmail,
   LOGIN_METHOD,
-  getVerificationTimeOffset,
+  getCodeExpirationTimeOffset,
   currentTime,
   hashString,
+  sendResetPasswordEmail,
+  createTokenUser,
+  getJWTToken,
 } = require("../util");
 const { User } = require("../model");
-const { UnauthenticatedError, BadRequestError } = require("../error");
+const {
+  UnauthenticatedError,
+  BadRequestError,
+  NotFoundError,
+} = require("../error");
 
 const register = async (req, res) => {
   const verificationCode = createRandomOtp();
@@ -20,7 +27,7 @@ const register = async (req, res) => {
   const userModel = new User({
     ...req.body,
     verificationCode: hashString(verificationCode),
-    verificationCodeExpiration: getVerificationTimeOffset(),
+    verificationCodeExpiration: getCodeExpirationTimeOffset(),
     loginMethod: LOGIN_METHOD.normal,
   });
 
@@ -76,4 +83,182 @@ const verify = async (req, res) => {
   res.status(StatusCodes.OK).json({ msg: "Email verified successfully" });
 };
 
-module.exports = { register, verify };
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  const user = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  });
+
+  if (!user) {
+    throw new NotFoundError(`${email} does not exist, please register`);
+  }
+
+  const userModel = new User(user);
+  if (userModel.isGoogleUser()) {
+    throw new BadRequestError(`Please login via google`);
+  }
+  userModel.checkResetPasswordCodeValidity();
+
+  const resetPasswordCode = createRandomOtp();
+  console.log({ resetPasswordCode });
+
+  await prisma.user.update({
+    data: {
+      resetPasswordCode: hashString(resetPasswordCode),
+      resetPasswordCodeExpiration: getCodeExpirationTimeOffset(),
+    },
+    where: {
+      email,
+    },
+  });
+
+  await sendResetPasswordEmail({
+    name: user.firstName,
+    email: user.email,
+    resetPasswordCode,
+  });
+
+  res
+    .status(StatusCodes.OK)
+    .json({ msg: `Password reset code sent to ${user.email}` });
+};
+
+const resetPassword = async (req, res) => {
+  const { code, email, password } = req.body;
+
+  const user = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  });
+
+  if (!user) {
+    throw new UnauthenticatedError("Verification failed");
+  }
+
+  const userModel = new User({
+    ...user,
+    password,
+  });
+
+  if (userModel.isGoogleUser()) {
+    throw new BadRequestError(`Please login via google`);
+  }
+
+  userModel.verifyResetPasswordCode(code);
+  await userModel.encryptPassword();
+
+  await prisma.user.update({
+    data: {
+      password: userModel.model.password,
+      resetPasswordCode: null,
+      resetPasswordCodeExpiration: null,
+    },
+    where: {
+      email,
+    },
+  });
+
+  res.status(StatusCodes.OK).json({ msg: "Password changed successfully" });
+};
+
+const login = async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  });
+
+  if (!user) {
+    throw new NotFoundError(`${email} does not exist, please register`);
+  }
+
+  const userModel = new User(user);
+  if (userModel.isGoogleUser()) {
+    throw new BadRequestError(`Please login via google`);
+  }
+  await userModel.comparePassword(password);
+  userModel.checkAuthorized();
+
+  const tokenUser = createTokenUser(user);
+  const token = getJWTToken(tokenUser);
+
+  res.status(StatusCodes.OK).json({
+    id: user.id,
+    name: user.name,
+    username: user.username,
+    email: user.email,
+    profileImageUrl: user.profileImageUrl,
+    token,
+  });
+};
+
+const googleLogin = async (req, res) => {
+  const { user: googleProfile } = req;
+
+  let user = await prisma.user.findUnique({
+    where: { email: googleProfile.email, loginMethod: LOGIN_METHOD.google },
+  });
+
+  if (!user) {
+    const userModel = new User({
+      ...googleProfile,
+      loginMethod: LOGIN_METHOD.google,
+      isVerified: true,
+      verifiedAt: currentTime(),
+    });
+
+    const existingGoogleEmail = await userModel.checkIfGoogleEmailExists();
+
+    if (existingGoogleEmail) {
+      const failure = {
+        existingGoogleEmail: true,
+        success: false,
+      };
+      const failureQueryString = new URLSearchParams(failure).toString();
+      return res.redirect(
+        `${process.env.FRONT_END_ORIGIN}/auth/google?${failureQueryString}`
+      );
+    }
+
+    await userModel.createUsername();
+    userModel.createPreference();
+
+    user = await prisma.user.create({
+      data: userModel.model,
+    });
+  }
+
+  const tokenUser = createTokenUser(user);
+  const token = getJWTToken(tokenUser);
+
+  const success = {
+    id: user.id,
+    name: user.name,
+    username: user.username,
+    email: user.email,
+    profileImageUrl: user.profileImageUrl,
+    token,
+    success: true,
+  };
+
+  const successQueryString = new URLSearchParams(success).toString();
+
+  res.redirect(
+    `${process.env.FRONT_END_ORIGIN}/auth/google?${successQueryString}`
+  );
+};
+
+module.exports = {
+  register,
+  verify,
+  forgotPassword,
+  resetPassword,
+  login,
+  googleLogin,
+};

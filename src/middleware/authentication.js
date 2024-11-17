@@ -1,5 +1,5 @@
-const CustomError = require("../error");
-const customUtils = require("../util");
+const { UnauthenticatedError } = require("../error");
+const { isTokenValid, checkTestUser } = require("../util");
 
 const authenticateUser = async (req, res, next) => {
   let token;
@@ -10,16 +10,16 @@ const authenticateUser = async (req, res, next) => {
   }
 
   if (!token) {
-    throw new CustomError.UnauthenticatedError("Authentication invalid");
+    throw new UnauthenticatedError("Authentication invalid");
   }
 
   try {
-    const user = customUtils.isTokenValid(token);
-    const testUser = customUtils.checkTestUser(user.id);
+    const user = isTokenValid(token);
+    const testUser = checkTestUser(user.id);
     req.user = { ...user, testUser };
     return next();
   } catch (err) {
-    throw new CustomError.UnauthenticatedError("Authentication invalid");
+    throw new UnauthenticatedError("Authentication invalid");
   }
 };
 

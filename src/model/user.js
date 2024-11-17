@@ -1,12 +1,13 @@
 const bcrypt = require("bcryptjs");
 const validator = require("validator");
-const { checkTimeExpired, hashString } = require("../util");
+const { checkTimeExpired, hashString, LOGIN_METHOD } = require("../util");
 const {
   UnauthenticatedError,
   ConflictError,
   BadRequestError,
   UnauthorizedError,
 } = require("../error");
+const prisma = require("../../prisma/prisma-client");
 
 class User {
   constructor(model) {
@@ -117,6 +118,39 @@ class User {
     };
 
     return this.model;
+  }
+
+  async createUsername() {
+    const baseUsername = this.model.name
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "");
+    let username = baseUsername;
+    let suffix = 1;
+
+    while (true) {
+      const existingUser = await prisma.user.findUnique({
+        where: { username },
+      });
+
+      if (!existingUser) break;
+      username = `${baseUsername}${suffix}`;
+      suffix++;
+    }
+
+    this.model.username = username;
+    return this.model;
+  }
+
+  async checkIfGoogleEmailExists() {
+    const existingUser = await prisma.user.findUnique({
+      where: { email: this.model.email, loginMethod: LOGIN_METHOD.normal },
+    });
+
+    return !!existingUser;
+  }
+
+  isGoogleUser() {
+    return this.model.loginMethod === LOGIN_METHOD.google;
   }
 }
 

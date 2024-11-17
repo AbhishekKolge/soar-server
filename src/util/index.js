@@ -28,7 +28,7 @@ const {
   currentTime,
   checkTimeExpired,
   time,
-  getVerificationTimeOffset,
+  getCodeExpirationTimeOffset,
 } = require("./time");
 const { createTokenUser } = require("./user");
 const { joiPassword, joiContactNo } = require("./validation");
@@ -66,5 +66,5 @@ module.exports = {
   passport,
   joiPassword,
   joiContactNo,
-  getVerificationTimeOffset,
+  getCodeExpirationTimeOffset,
 };

@@ -11,7 +11,7 @@ const time = (timeArg) => {
   return new Date(timeArg);
 };
 
-const getVerificationTimeOffset = () => {
+const getCodeExpirationTimeOffset = () => {
   return new Date(Date.now() + 1000 * 60 * 10);
 };
 
@@ -19,5 +19,5 @@ module.exports = {
   currentTime,
   checkTimeExpired,
   time,
-  getVerificationTimeOffset,
+  getCodeExpirationTimeOffset,
 };

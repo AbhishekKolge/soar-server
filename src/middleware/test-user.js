@@ -1,10 +1,8 @@
-const CustomError = require("../error");
+const { UnauthorizedError } = require("../error");
 
 const testUser = (req, res, next) => {
   if (req.user.testUser) {
-    throw new CustomError.UnauthorizedError(
-      "Test user can't perform this action"
-    );
+    throw new UnauthorizedError("Test user can't perform this action");
   }
   next();
 };
