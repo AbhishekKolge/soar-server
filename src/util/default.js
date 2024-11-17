@@ -15,7 +15,6 @@ const TRANSACTION_CATEGORY = {
   billExpense: "BILL_EXPENSE",
   others: "OTHERS",
 };
-const VERIFICATION_CODE_EXPIRATION_TIME = new Date(Date.now() + 1000 * 60 * 10);
 
 module.exports = {
   PORT,
@@ -24,5 +23,4 @@ module.exports = {
   LOGIN_METHOD,
   TRANSACTION_METHOD,
   TRANSACTION_CATEGORY,
-  VERIFICATION_CODE_EXPIRATION_TIME,
 };

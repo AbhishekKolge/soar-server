@@ -6,9 +6,12 @@ const {
   createRandomOtp,
   sendVerificationEmail,
   LOGIN_METHOD,
-  VERIFICATION_CODE_EXPIRATION_TIME,
+  getVerificationTimeOffset,
+  currentTime,
+  hashString,
 } = require("../util");
 const { User } = require("../model");
+const { UnauthenticatedError, BadRequestError } = require("../error");
 
 const register = async (req, res) => {
   const verificationCode = createRandomOtp();
@@ -16,8 +19,8 @@ const register = async (req, res) => {
 
   const userModel = new User({
     ...req.body,
-    verificationCode,
-    verificationCodeExpiration: VERIFICATION_CODE_EXPIRATION_TIME,
+    verificationCode: hashString(verificationCode),
+    verificationCodeExpiration: getVerificationTimeOffset(),
     loginMethod: LOGIN_METHOD.normal,
   });
 
@@ -39,4 +42,38 @@ const register = async (req, res) => {
   });
 };
 
-module.exports = { register };
+const verify = async (req, res) => {
+  const { email, code } = req.body;
+
+  const user = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  });
+
+  if (!user) {
+    throw new UnauthenticatedError("Verification failed");
+  }
+
+  if (user.isVerified) {
+    throw new BadRequestError("Already verified");
+  }
+
+  new User(user).compareVerificationCode(code);
+
+  await prisma.user.update({
+    data: {
+      isVerified: true,
+      verifiedAt: currentTime(),
+      verificationCode: null,
+      verificationCodeExpiration: null,
+    },
+    where: {
+      email,
+    },
+  });
+
+  res.status(StatusCodes.OK).json({ msg: "Email verified successfully" });
+};
+
+module.exports = { register, verify };

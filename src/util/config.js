@@ -6,5 +6,6 @@ const nodeMailerConfig = {
     pass: process.env.SENDGRID_API_KEY,
   },
 };
+const isProductionEnv = process.env.NODE_ENV === "production";
 
-module.exports = { nodeMailerConfig };
+module.exports = { nodeMailerConfig, isProductionEnv };

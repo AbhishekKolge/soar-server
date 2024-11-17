@@ -1,3 +1,3 @@
-const { register } = require("./auth");
+const { register, verify } = require("./auth");
 
-module.exports = { register };
+module.exports = { register, verify };

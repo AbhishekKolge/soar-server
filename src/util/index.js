@@ -1,4 +1,4 @@
-const { nodeMailerConfig } = require("./config");
+const { nodeMailerConfig, isProductionEnv } = require("./config");
 const {
   PORT,
   GOOGLE_SCOPE,
@@ -6,7 +6,6 @@ const {
   LOGIN_METHOD,
   TRANSACTION_METHOD,
   TRANSACTION_CATEGORY,
-  VERIFICATION_CODE_EXPIRATION_TIME,
 } = require("./default");
 const {
   sendEmail,
@@ -25,7 +24,12 @@ const {
   getRequestIp,
   checkTestUser,
 } = require("./request");
-const { currentTime, checkTimeExpired, time } = require("./time");
+const {
+  currentTime,
+  checkTimeExpired,
+  time,
+  getVerificationTimeOffset,
+} = require("./time");
 const { createTokenUser } = require("./user");
 const { joiPassword, joiContactNo } = require("./validation");
 
@@ -36,10 +40,10 @@ module.exports = {
   LOGIN_METHOD,
   TRANSACTION_METHOD,
   TRANSACTION_CATEGORY,
-  VERIFICATION_CODE_EXPIRATION_TIME,
   shutdown,
   start,
   nodeMailerConfig,
+  isProductionEnv,
   sendEmail,
   sendResetPasswordEmail,
   sendVerificationEmail,
@@ -62,4 +66,5 @@ module.exports = {
   passport,
   joiPassword,
   joiContactNo,
+  getVerificationTimeOffset,
 };

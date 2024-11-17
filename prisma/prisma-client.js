@@ -1,8 +1,9 @@
 const { PrismaClient } = require("@prisma/client");
+const { isProductionEnv } = require("../src/util");
 
 const prisma = global.prisma || new PrismaClient();
 
-if (process.env.NODE_ENV === "development") {
+if (!isProductionEnv) {
   global.prisma = prisma;
 }
 

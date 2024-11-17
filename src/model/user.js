@@ -14,9 +14,23 @@ class User {
   }
 
   compareVerificationCode(code) {
+    if (
+      !this.model.verificationCodeExpiration ||
+      !this.model.verificationCode
+    ) {
+      throw new UnauthenticatedError("Please generate verification code");
+    }
+    const isExpired = checkTimeExpired(this.model.verificationCodeExpiration);
+
+    if (isExpired) {
+      throw new UnauthenticatedError("Verification code has expired");
+    }
+
     const isMatch = this.model.verificationCode === hashString(code);
 
-    if (!isMatch) throw new UnauthenticatedError("Verification failed");
+    if (!isMatch) {
+      throw new UnauthenticatedError("Verification failed");
+    }
   }
 
   checkVerificationCodeValidity() {

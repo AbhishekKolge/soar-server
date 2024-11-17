@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 
-const { nodeMailerConfig } = require("./config");
+const { nodeMailerConfig, isProductionEnv } = require("./config");
 
 const sendEmail = async ({ to, subject, html }) => {
   const transporter = nodemailer.createTransport(nodeMailerConfig);
@@ -14,6 +14,10 @@ const sendEmail = async ({ to, subject, html }) => {
 };
 
 const sendResetPasswordEmail = async ({ name, email, passwordCode }) => {
+  if (!isProductionEnv) {
+    return;
+  }
+
   const message = `<p>Your password reset code is ${passwordCode}</p>`;
 
   const html = `<h4>Hello, ${name}</h4> ${message}`;
@@ -26,6 +30,10 @@ const sendResetPasswordEmail = async ({ name, email, passwordCode }) => {
 };
 
 const sendVerificationEmail = async ({ name, email, verificationCode }) => {
+  if (!isProductionEnv) {
+    return;
+  }
+
   const message = `<p>Your email verification code is ${verificationCode}</p>`;
 
   const html = `<h4>Hello, ${name}</h4> ${message}`;
