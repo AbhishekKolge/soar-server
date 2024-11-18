@@ -6,6 +6,7 @@ const {
   login,
   googleLogin,
 } = require("./auth");
+const { getCountries } = require("./utils");
 
 module.exports = {
   register,
@@ -14,4 +15,5 @@ module.exports = {
   resetPassword,
   login,
   googleLogin,
+  getCountries,
 };
