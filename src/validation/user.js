@@ -20,15 +20,15 @@ const removeProfileImageSchema = (req, res, next) => {
 const updateUserSchema = (req, res, next) => {
   const schema = Joi.object()
     .keys({
-      name: Joi.string().trim().max(50).optional(),
-      username: Joi.string().trim().max(50).optional(),
+      name: Joi.string().trim().max(50).min(3).optional(),
+      username: Joi.string().trim().max(50).min(3).optional(),
       dob: Joi.date().iso().allow(null).optional(),
       contactNumber: joiContactNo.string().phoneNumber().allow(null).optional(),
       contactCountryId: Joi.string().trim().allow(null).optional(),
-      present: Joi.string().trim().max(200).allow(null).optional(),
-      permanent: Joi.string().trim().max(200).allow(null).optional(),
-      city: Joi.string().trim().max(50).allow(null).optional(),
-      postalCode: Joi.string().trim().max(10).allow(null).optional(),
+      present: Joi.string().trim().max(200).min(3).allow(null).optional(),
+      permanent: Joi.string().trim().max(200).min(3).allow(null).optional(),
+      city: Joi.string().trim().max(50).min(3).allow(null).optional(),
+      postalCode: Joi.string().trim().max(10).min(3).allow(null).optional(),
       countryId: Joi.string().trim().allow(null).optional(),
     })
     .when(Joi.object({ contactNumber: Joi.exist() }).unknown(), {

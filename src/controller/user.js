@@ -114,6 +114,10 @@ const updateUser = async (req, res) => {
     updateData.contactCountry = {
       connect: { id: contactCountryId },
     };
+  } else if (contactCountryId === null) {
+    updateData.contactCountry = {
+      disconnect: true,
+    };
   }
 
   await prisma.user.update({
