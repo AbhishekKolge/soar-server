@@ -22,7 +22,7 @@ const {
   GOOGLE_SESSION,
 } = require("./util");
 
-const { authRouter, utilsRouter } = require("./route");
+const { authRouter, utilsRouter, userRouter } = require("./route");
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -46,6 +46,7 @@ app.use(rateLimiterSetup);
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/utils", utilsRouter);
+app.use("/api/v1/user", userRouter);
 
 app.use(notFound);
 app.use(errorHandler);

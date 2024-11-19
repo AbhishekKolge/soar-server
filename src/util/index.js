@@ -6,12 +6,14 @@ const {
   LOGIN_METHOD,
   TRANSACTION_METHOD,
   TRANSACTION_CATEGORY,
+  MAX_IMAGE_SIZE,
 } = require("./default");
 const {
   sendEmail,
   sendResetPasswordEmail,
   sendVerificationEmail,
 } = require("./email");
+const { validateImage, deleteCloudinaryImage } = require("./file");
 const { removeQuotes } = require("./format");
 const { hashString, createRandomBytes, createRandomOtp } = require("./hash");
 const { createJWT, isTokenValid, getJWTToken } = require("./jwt");
@@ -67,4 +69,7 @@ module.exports = {
   joiPassword,
   joiContactNo,
   getCodeExpirationTimeOffset,
+  MAX_IMAGE_SIZE,
+  validateImage,
+  deleteCloudinaryImage,
 };
