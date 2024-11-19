@@ -1,6 +1,7 @@
 const nodemailer = require("nodemailer");
 
 const { nodeMailerConfig, isProductionEnv } = require("./config");
+const { time, currentTime } = require("./time");
 
 const sendEmail = async ({ to, subject, html }) => {
   const transporter = nodemailer.createTransport(nodeMailerConfig);
@@ -45,4 +46,27 @@ const sendVerificationEmail = async ({ name, email, verificationCode }) => {
   });
 };
 
-module.exports = { sendEmail, sendResetPasswordEmail, sendVerificationEmail };
+const sendLoginAlertNotificationEmail = async ({ name, email }) => {
+  if (!isProductionEnv) {
+    return;
+  }
+
+  const message = `<p>Your account has been logged in on ${time(
+    currentTime()
+  )}</p>`;
+
+  const html = `<h4>Hello, ${name}</h4> ${message}`;
+
+  return sendEmail({
+    to: email,
+    subject: `${process.env.APP_NAME} Login Alert Notification`,
+    html,
+  });
+};
+
+module.exports = {
+  sendEmail,
+  sendResetPasswordEmail,
+  sendVerificationEmail,
+  sendLoginAlertNotificationEmail,
+};

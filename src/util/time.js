@@ -8,8 +8,19 @@ const checkTimeExpired = (timeArg) => {
 };
 
 const time = (timeArg) => {
-  return new Date(timeArg);
+  const options = {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    timeZoneName: "short",
+  };
+  return new Date(timeArg).toLocaleDateString(undefined, options);
 };
+
 
 const getCodeExpirationTimeOffset = () => {
   return new Date(Date.now() + 1000 * 60 * 10);
