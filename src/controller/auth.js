@@ -12,6 +12,7 @@ const {
   sendResetPasswordEmail,
   createTokenUser,
   getJWTToken,
+  sendLoginAlertNotificationEmail,
 } = require("../util");
 const { User } = require("../model");
 const {
@@ -172,6 +173,9 @@ const login = async (req, res) => {
     where: {
       email,
     },
+    include: {
+      notification: true,
+    },
   });
 
   if (!user) {
@@ -196,6 +200,13 @@ const login = async (req, res) => {
     profileImageUrl: user.profileImageUrl,
     token,
   });
+
+  if (user.notification.loginAlert) {
+    sendLoginAlertNotificationEmail({
+      name: user.name,
+      email: user.email,
+    });
+  }
 };
 
 const googleLogin = async (req, res) => {
@@ -203,6 +214,9 @@ const googleLogin = async (req, res) => {
 
   let user = await prisma.user.findUnique({
     where: { email: googleProfile.email, loginMethod: LOGIN_METHOD.google },
+    include: {
+      notification: true,
+    },
   });
 
   if (!user) {
@@ -227,10 +241,14 @@ const googleLogin = async (req, res) => {
     }
 
     await userModel.createUsername();
+    await userModel.uploadGoogleProfileImage();
     userModel.createPreference();
 
     user = await prisma.user.create({
       data: userModel.model,
+      include: {
+        notification: true,
+      },
     });
   }
 
@@ -252,6 +270,13 @@ const googleLogin = async (req, res) => {
   res.redirect(
     `${process.env.FRONT_END_ORIGIN}/auth/google?${successQueryString}`
   );
+
+  if (user.notification.loginAlert) {
+    sendLoginAlertNotificationEmail({
+      name: user.name,
+      email: user.email,
+    });
+  }
 };
 
 module.exports = {

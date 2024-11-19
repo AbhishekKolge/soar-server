@@ -5,11 +5,7 @@ const prisma = require("../../prisma/prisma-client");
 
 const retrieve = require("../retrieve-schema");
 const { BadRequestError, NotFoundError } = require("../error");
-const {
-  MAX_IMAGE_SIZE,
-  validateImage,
-  deleteCloudinaryImage,
-} = require("../util");
+const { uploadImage, deleteCloudinaryImage } = require("../util");
 
 const showCurrentUser = async (req, res) => {
   const user = await prisma.user.findUnique({
@@ -24,7 +20,7 @@ const showCurrentUser = async (req, res) => {
 
 const uploadProfileImage = async (req, res) => {
   try {
-    const result = await validateImage("profileImage", "profile-images", req);
+    const result = await uploadImage("profileImage", "profile-images", req);
 
     const { profileImageId: oldProfileImageId } = await prisma.user.findUnique({
       where: {
@@ -97,16 +93,31 @@ const removeProfileImage = async (req, res) => {
 
 const updateUser = async (req, res) => {
   const { id } = req.user;
-  const { present, permanent, city, postalCode, countryId, ...userDetails } =
-    req.body;
+  const {
+    present,
+    permanent,
+    city,
+    postalCode,
+    countryId,
+    contactCountryId,
+    ...userDetails
+  } = req.body;
+
+  const updateData = {
+    ...userDetails,
+    address: {
+      update: { present, permanent, city, postalCode, countryId },
+    },
+  };
+
+  if (contactCountryId) {
+    updateData.contactCountry = {
+      connect: { id: contactCountryId },
+    };
+  }
 
   await prisma.user.update({
-    data: {
-      ...userDetails,
-      address: {
-        update: { present, permanent, city, postalCode, countryId },
-      },
-    },
+    data: updateData,
     where: {
       id,
     },

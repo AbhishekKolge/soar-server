@@ -1,6 +1,11 @@
 const bcrypt = require("bcryptjs");
 const validator = require("validator");
-const { checkTimeExpired, hashString, LOGIN_METHOD } = require("../util");
+const {
+  checkTimeExpired,
+  hashString,
+  LOGIN_METHOD,
+  uploadGoogleImage,
+} = require("../util");
 const {
   UnauthenticatedError,
   ConflictError,
@@ -151,6 +156,19 @@ class User {
 
   isGoogleUser() {
     return this.model.loginMethod === LOGIN_METHOD.google;
+  }
+
+  async uploadGoogleProfileImage() {
+    if (this.model.profileImageUrl && !this.model.profileImageId) {
+      const result = await uploadGoogleImage(
+        this.model.profileImageUrl,
+        "profile-images"
+      );
+      this.model.profileImageUrl = result.secure_url;
+      this.model.profileImageId = result.public_id;
+    }
+
+    return this.model;
   }
 }
 

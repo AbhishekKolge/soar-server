@@ -12,8 +12,13 @@ const {
   sendEmail,
   sendResetPasswordEmail,
   sendVerificationEmail,
+  sendLoginAlertNotificationEmail,
 } = require("./email");
-const { validateImage, deleteCloudinaryImage } = require("./file");
+const {
+  uploadImage,
+  deleteCloudinaryImage,
+  uploadGoogleImage,
+} = require("./file");
 const { removeQuotes } = require("./format");
 const { hashString, createRandomBytes, createRandomOtp } = require("./hash");
 const { createJWT, isTokenValid, getJWTToken } = require("./jwt");
@@ -70,6 +75,8 @@ module.exports = {
   joiContactNo,
   getCodeExpirationTimeOffset,
   MAX_IMAGE_SIZE,
-  validateImage,
+  uploadImage,
   deleteCloudinaryImage,
+  uploadGoogleImage,
+  sendLoginAlertNotificationEmail,
 };
