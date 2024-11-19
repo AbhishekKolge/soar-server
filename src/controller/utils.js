@@ -2,14 +2,11 @@ const { StatusCodes } = require("http-status-codes");
 
 const prisma = require("../../prisma/prisma-client");
 
+const retrieve = require("../retrieve-schema");
+
 const getCountries = async (req, res) => {
   const countries = await prisma.country.findMany({
-    select: {
-      id: true,
-      name: true,
-      shortName: true,
-      phoneCode: true,
-    },
+    select: retrieve.countries,
     orderBy: {
       name: "asc",
     },

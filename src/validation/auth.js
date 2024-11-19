@@ -31,7 +31,9 @@ const registerSchema = (req, res, next) => {
     })
     .when(Joi.object({ contactCountryId: Joi.exist() }).unknown(), {
       then: Joi.object({
-        contactNumber: joiContactNo.string().phoneNumber().required(),
+        contactNumber: joiContactNo.string().phoneNumber().required().messages({
+          "any.required": "contact number is required",
+        }),
       }),
     });
 

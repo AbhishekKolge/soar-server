@@ -15,6 +15,7 @@ const TRANSACTION_CATEGORY = {
   billExpense: "BILL_EXPENSE",
   others: "OTHERS",
 };
+const MAX_IMAGE_SIZE = 1024 * 1024;
 
 module.exports = {
   PORT,
@@ -23,4 +24,5 @@ module.exports = {
   LOGIN_METHOD,
   TRANSACTION_METHOD,
   TRANSACTION_CATEGORY,
+  MAX_IMAGE_SIZE,
 };

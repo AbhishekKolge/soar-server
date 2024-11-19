@@ -5,6 +5,14 @@ const {
   resetPasswordSchema,
   loginSchema,
 } = require("./auth");
+const {
+  uploadProfileImageSchema,
+  removeProfileImageSchema,
+  updateUserSchema,
+  deleteUserSchema,
+  updateSecuritySchema,
+  updatePreferenceSchema,
+} = require("./user");
 
 module.exports = {
   registerSchema,
@@ -12,4 +20,10 @@ module.exports = {
   forgotPasswordSchema,
   resetPasswordSchema,
   loginSchema,
+  uploadProfileImageSchema,
+  removeProfileImageSchema,
+  updateUserSchema,
+  deleteUserSchema,
+  updateSecuritySchema,
+  updatePreferenceSchema,
 };
