@@ -6,6 +6,11 @@ const {
   loginSchema,
 } = require("./auth");
 const {
+  addCreditCardSchema,
+  updateCreditCardSchema,
+  deleteCreditCardSchema,
+} = require("./credit-card");
+const {
   uploadProfileImageSchema,
   removeProfileImageSchema,
   updateUserSchema,
@@ -26,4 +31,7 @@ module.exports = {
   deleteUserSchema,
   updateSecuritySchema,
   updatePreferenceSchema,
+  addCreditCardSchema,
+  updateCreditCardSchema,
+  deleteCreditCardSchema,
 };

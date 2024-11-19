@@ -7,6 +7,12 @@ const {
   googleLogin,
 } = require("./auth");
 const {
+  addCreditCard,
+  updateCreditCard,
+  getCreditCard,
+  deleteCreditCard,
+} = require("./credit-card");
+const {
   showCurrentUser,
   uploadProfileImage,
   removeProfileImage,
@@ -36,4 +42,8 @@ module.exports = {
   getSecurity,
   updatePreference,
   getPreference,
+  addCreditCard,
+  updateCreditCard,
+  deleteCreditCard,
+  getCreditCard,
 };

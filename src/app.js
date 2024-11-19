@@ -14,15 +14,14 @@ const {
   errorHandler,
 } = require("./middleware");
 
-const {
-  shutdown,
-  start,
-  passport,
-  GOOGLE_SCOPE,
-  GOOGLE_SESSION,
-} = require("./util");
+const { shutdown, start } = require("./util");
 
-const { authRouter, utilsRouter, userRouter } = require("./route");
+const {
+  authRouter,
+  utilsRouter,
+  userRouter,
+  creditCardRouter,
+} = require("./route");
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -47,6 +46,7 @@ app.use(rateLimiterSetup);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/utils", utilsRouter);
 app.use("/api/v1/user", userRouter);
+app.use("/api/v1/credit-card", creditCardRouter);
 
 app.use(notFound);
 app.use(errorHandler);
