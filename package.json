@@ -7,7 +7,8 @@
     "start": "node src/app.js",
     "dev": "node --watch src/app.js",
     "seed-country": "node seed/country.js",
-    "seed": "npm-run-all -s seed-country"
+    "seed-bank": "node seed/bank.js",
+    "seed": "npm-run-all -s seed-country seed-bank"
   },
   "keywords": [
     "Finance",

@@ -46,7 +46,7 @@ const uploadProfileImage = async (req, res) => {
       profileImageUrl: result.secure_url,
     });
   } catch (error) {
-    if (req.files?.profileImage) {
+    if (req.files?.profileImage?.tempFilePath) {
       await fs.unlink(req.files.profileImage.tempFilePath);
     }
     throw error;

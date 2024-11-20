@@ -17,6 +17,20 @@ const getCountries = async (req, res) => {
   });
 };
 
+const getBanks = async (req, res) => {
+  const banks = await prisma.bank.findMany({
+    select: retrieve.banks,
+    orderBy: {
+      name: "asc",
+    },
+  });
+
+  res.status(StatusCodes.OK).json({
+    banks,
+  });
+};
+
 module.exports = {
   getCountries,
+  getBanks,
 };

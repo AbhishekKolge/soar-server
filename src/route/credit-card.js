@@ -30,11 +30,9 @@ creditCardRouter
     [authenticateUser, updateCreditCardSchema, validateRequest],
     updateCreditCard
   )
-  .delete([
-    authenticateUser,
-    deleteCreditCardSchema,
-    validateRequest,
-    deleteCreditCard,
-  ]);
+  .delete(
+    [authenticateUser, deleteCreditCardSchema, validateRequest],
+    deleteCreditCard
+  );
 
 module.exports = creditCardRouter;
