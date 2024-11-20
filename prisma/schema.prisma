@@ -14,8 +14,8 @@ model User {
   email                       String       @unique
   password                    String?
   dob                         DateTime?    @db.Timestamptz
-  contactNumber               String?       @unique
-  contactCountry              Country?      @relation(fields: [contactCountryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  contactNumber               String?      @unique
+  contactCountry              Country?     @relation(fields: [contactCountryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   contactCountryId            String?
   loginMethod                 LoginMethod
   profileImageUrl             String?
@@ -91,6 +91,8 @@ model Card {
   balance      Balance       @relation(fields: [balanceId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   balanceId    String        @unique
   transactions Transaction[]
+
+  @@unique([number, userId])
 }
 
 model Balance {
@@ -113,6 +115,8 @@ model Account {
   bank         Bank          @relation(fields: [bankId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   bankId       String
   transactions Transaction[]
+
+  @@unique([number, userId])
 }
 
 model Bank {
