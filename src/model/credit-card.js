@@ -1,3 +1,4 @@
+const { Decimal } = require("@prisma/client/runtime/library");
 const { BadRequestError } = require("../error");
 const {
   Encrypter,
@@ -91,7 +92,8 @@ const generateTransactions = (cardId) => {
       TRANSACTION_CATEGORY_LIST[
         Math.floor(Math.random() * TRANSACTION_CATEGORY_LIST.length)
       ];
-    const amount = faker.finance.amount();
+
+    const amount = new Decimal(faker.finance.amount());
 
     const transaction = {
       method,

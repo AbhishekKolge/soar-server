@@ -13,10 +13,10 @@ CREATE TABLE "User" (
     "name" TEXT NOT NULL,
     "username" TEXT NOT NULL,
     "email" TEXT NOT NULL,
-    "password" TEXT NOT NULL,
+    "password" TEXT,
     "dob" TIMESTAMPTZ,
-    "contactNumber" TEXT NOT NULL,
-    "contactcountryId" TEXT NOT NULL,
+    "contactNumber" TEXT,
+    "contactCountryId" TEXT,
     "loginMethod" "LoginMethod" NOT NULL,
     "profileImageUrl" TEXT,
     "profileImageId" TEXT,
@@ -26,8 +26,6 @@ CREATE TABLE "User" (
     "verifiedAt" TIMESTAMPTZ,
     "resetPasswordCode" TEXT,
     "resetPasswordCodeExpiration" TIMESTAMPTZ,
-    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
-    "deletedAt" TIMESTAMPTZ,
     "createdAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMPTZ NOT NULL,
     "addressId" TEXT NOT NULL,
@@ -90,8 +88,6 @@ CREATE TABLE "Card" (
     "isSelected" BOOLEAN NOT NULL DEFAULT false,
     "validity" TIMESTAMPTZ NOT NULL,
     "pin" TEXT NOT NULL,
-    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
-    "deletedAt" TIMESTAMPTZ,
     "createdAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMPTZ NOT NULL,
     "userId" TEXT NOT NULL,
@@ -116,8 +112,6 @@ CREATE TABLE "Account" (
     "imageId" TEXT,
     "name" TEXT NOT NULL,
     "identity" TEXT,
-    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
-    "deletedAt" TIMESTAMPTZ,
     "createdAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMPTZ NOT NULL,
     "userId" TEXT NOT NULL,
@@ -140,7 +134,7 @@ CREATE TABLE "Bank" (
 CREATE TABLE "Transaction" (
     "id" TEXT NOT NULL,
     "method" "TransactionMethod" NOT NULL,
-    "amount" TEXT NOT NULL,
+    "amount" DECIMAL(65,30) NOT NULL,
     "cardId" TEXT NOT NULL,
     "createdAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "accountId" TEXT,
@@ -188,7 +182,7 @@ CREATE UNIQUE INDEX "Account_number_key" ON "Account"("number");
 CREATE UNIQUE INDEX "Bank_name_key" ON "Bank"("name");
 
 -- AddForeignKey
-ALTER TABLE "User" ADD CONSTRAINT "User_contactcountryId_fkey" FOREIGN KEY ("contactcountryId") REFERENCES "Country"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "User" ADD CONSTRAINT "User_contactCountryId_fkey" FOREIGN KEY ("contactCountryId") REFERENCES "Country"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_addressId_fkey" FOREIGN KEY ("addressId") REFERENCES "Address"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
