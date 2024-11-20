@@ -126,7 +126,7 @@ model Bank {
 model Transaction {
   id        String              @id @default(uuid())
   method    TransactionMethod
-  amount    String
+  amount    Decimal
   card      Card                @relation(fields: [cardId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   cardId    String
   createdAt DateTime            @default(now()) @db.Timestamptz
