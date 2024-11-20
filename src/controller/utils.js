@@ -3,6 +3,7 @@ const { StatusCodes } = require("http-status-codes");
 const prisma = require("../../prisma/prisma-client");
 
 const retrieve = require("../retrieve-schema");
+const { QueryBuilder } = require("../util");
 
 const getCountries = async (req, res) => {
   const countries = await prisma.country.findMany({
@@ -18,16 +19,24 @@ const getCountries = async (req, res) => {
 };
 
 const getBanks = async (req, res) => {
-  const banks = await prisma.bank.findMany({
-    select: retrieve.banks,
-    orderBy: {
-      name: "asc",
-    },
+  const { page, search } = req.query;
+
+  const queryBuilder = new QueryBuilder({
+    model: prisma.bank,
+    searchFields: ["name"],
+    sortKey: "name",
   });
 
-  res.status(StatusCodes.OK).json({
-    banks,
-  });
+  const { results, totalCount, totalPages } = await queryBuilder
+    .filter({
+      search,
+    })
+    .sort("lowest")
+    .paginate(page)
+    .select(["id", "name"])
+    .execute();
+
+  res.status(StatusCodes.OK).json({ results, totalCount, totalPages });
 };
 
 module.exports = {
