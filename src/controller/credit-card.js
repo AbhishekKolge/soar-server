@@ -3,7 +3,8 @@ const { StatusCodes } = require("http-status-codes");
 const prisma = require("../../prisma/prisma-client");
 const { CreditCard, generateTransactions } = require("../model");
 const retrieve = require("../retrieve-schema");
-const { NotFoundError } = require("../error");
+const { NotFoundError, BadRequestError } = require("../error");
+const { MAX_CARDS } = require("../util");
 
 const addCreditCard = async (req, res) => {
   const { id } = req.user;
@@ -12,6 +13,20 @@ const addCreditCard = async (req, res) => {
   creditCardModel.encryptPin();
   creditCardModel.generateBalance();
   creditCardModel.attachUser(id);
+
+  const totalCreditCards = await prisma.card.count({
+    where: {
+      userId: id,
+    },
+  });
+
+  if (totalCreditCards >= MAX_CARDS) {
+    throw new BadRequestError("Maximum 6 cards can be added");
+  }
+
+  if (!totalCreditCards) {
+    creditCardModel.setActive();
+  }
 
   await prisma.$transaction(async (tx) => {
     if (creditCardModel.model.isSelected) {
@@ -69,12 +84,17 @@ const updateCreditCard = async (req, res) => {
     if (!creditCardModel.model.isSelected && creditCard.isSelected) {
       const newSelectedCard = await tx.card.findFirst({
         where: { isSelected: false, userId: user.id },
+        orderBy: {
+          createdAt: "desc",
+        },
       });
       if (newSelectedCard) {
         await tx.card.update({
           where: { id: newSelectedCard.id },
           data: { isSelected: true },
         });
+      } else {
+        throw new BadRequestError("At least one card should set to active");
       }
     }
 
@@ -112,6 +132,9 @@ const deleteCreditCard = async (req, res) => {
     if (creditCard.isSelected) {
       const newSelectedCard = await tx.card.findFirst({
         where: { isSelected: false, userId: user.id },
+        orderBy: {
+          createdAt: "desc",
+        },
       });
       if (newSelectedCard) {
         await tx.card.update({
@@ -149,6 +172,7 @@ const getCreditCard = async (req, res) => {
   creditCards = creditCards.map((card) => {
     const creditCardModel = new CreditCard(card);
     creditCardModel.decryptBalance();
+    creditCardModel.decryptPin();
     return creditCardModel.model;
   });
 

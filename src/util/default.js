@@ -27,7 +27,7 @@ const TRANSACTION_CATEGORY_LIST = [
 ];
 
 const MAX_IMAGE_SIZE = 1024 * 1024;
-
+const MAX_CARDS = 6;
 
 module.exports = {
   PORT,
@@ -39,4 +39,5 @@ module.exports = {
   MAX_IMAGE_SIZE,
   TRANSACTION_METHOD_LIST,
   TRANSACTION_CATEGORY_LIST,
+  MAX_CARDS,
 };
