@@ -8,17 +8,20 @@ const { MAX_CARDS, uploadImage, deleteCloudinaryImage } = require("../util");
 const { QueryBuilder } = require("../util");
 
 const addAccount = async (req, res) => {
-  let imageId = "";
+  const { id } = req.user;
+  const accountDetails = {
+    ...req.body,
+  };
   try {
-    const { id } = req.user;
-    const result = await uploadImage("image", "account-images", req);
-    imageId = result.public_id;
+    if (req.files?.image) {
+      const result = await uploadImage("image", "account-images", req);
+      accountDetails.imageUrl = result.secure_url;
+      accountDetails.imageId = result.public_id;
+    }
 
     await prisma.account.create({
       data: {
-        ...req.body,
-        imageUrl: result.secure_url,
-        imageId,
+        ...accountDetails,
         userId: id,
       },
     });
@@ -27,8 +30,8 @@ const addAccount = async (req, res) => {
       msg: "Account added successfully",
     });
   } catch (error) {
-    if (imageId) {
-      await deleteCloudinaryImage(imageId);
+    if (accountDetails.imageId) {
+      await deleteCloudinaryImage(accountDetails.imageId);
     } else if (req.files?.image?.tempFilePath) {
       await fs.unlink(req.files.image.tempFilePath);
     }
@@ -65,12 +68,20 @@ const updateAccount = async (req, res) => {
       updatedAccount.imageId = result.public_id;
     }
 
+    if (updatedAccount.imageUrl === null && account.imageId) {
+      updatedAccount.imageId = null;
+    }
+
     await prisma.account.update({
       data: updatedAccount,
       where: {
         id,
       },
     });
+
+    if (updatedAccount.imageUrl === null && account.imageId) {
+      await deleteCloudinaryImage(account.imageId);
+    }
 
     if (updatedAccount.imageId && account.imageId) {
       await deleteCloudinaryImage(account.imageId);
