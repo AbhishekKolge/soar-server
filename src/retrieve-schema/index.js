@@ -1,10 +1,13 @@
-const { balance } = require("../../prisma/prisma-client");
-
 const countries = {
   id: true,
   name: true,
   shortName: true,
   phoneCode: true,
+};
+
+const banks = {
+  id: true,
+  name: true,
 };
 
 const user = {
@@ -65,6 +68,18 @@ const transaction = {
   category: true,
 };
 
+const account = {
+  id: true,
+  number: true,
+  imageUrl: true,
+  imageId: true,
+  name: true,
+  identity: true,
+  bank: {
+    select: banks,
+  },
+};
+
 module.exports = {
   countries,
   user,
@@ -72,4 +87,6 @@ module.exports = {
   preference,
   creditCard,
   transaction,
+  banks,
+  account,
 };

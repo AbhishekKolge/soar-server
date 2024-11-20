@@ -1,4 +1,9 @@
 const {
+  addAccountSchema,
+  updateAccountSchema,
+  deleteAccountSchema,
+} = require("./account");
+const {
   registerSchema,
   verifySchema,
   forgotPasswordSchema,
@@ -34,4 +39,7 @@ module.exports = {
   addCreditCardSchema,
   updateCreditCardSchema,
   deleteCreditCardSchema,
+  addAccountSchema,
+  updateAccountSchema,
+  deleteAccountSchema,
 };

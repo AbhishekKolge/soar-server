@@ -1,4 +1,10 @@
 const {
+  addAccount,
+  updateAccount,
+  deleteAccount,
+  getAccount,
+} = require("./account");
+const {
   register,
   verify,
   forgotPassword,
@@ -24,7 +30,7 @@ const {
   updatePreference,
   getPreference,
 } = require("./user");
-const { getCountries } = require("./utils");
+const { getCountries, getBanks } = require("./utils");
 
 module.exports = {
   register,
@@ -34,6 +40,7 @@ module.exports = {
   login,
   googleLogin,
   getCountries,
+  getBanks,
   showCurrentUser,
   uploadProfileImage,
   removeProfileImage,
@@ -48,4 +55,8 @@ module.exports = {
   deleteCreditCard,
   getCreditCard,
   getTransaction,
+  addAccount,
+  updateAccount,
+  deleteAccount,
+  getAccount,
 };

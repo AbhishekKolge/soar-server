@@ -118,8 +118,6 @@ model Account {
 model Bank {
   id       String    @id @default(uuid())
   name     String    @unique
-  logoUrl  String
-  logoId   String
   accounts Account[]
 }
 
