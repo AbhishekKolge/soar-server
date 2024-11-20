@@ -77,6 +77,22 @@ class CreditCard {
     this.model.isSelected = true;
     return this.model;
   }
+
+  comparePin(pin) {
+    if (pin !== this.model.pin) {
+      throw new BadRequestError("Please enter correct pin");
+    }
+  }
+
+  validateTransfer(amount) {
+    if (+this.model.balance.amount < +amount) {
+      throw new BadRequestError("Sufficient balance not available");
+    }
+  }
+
+  getRemainingBalance(amount) {
+    return +this.model.balance.amount - +amount;
+  }
 }
 
 const generateTransactions = (cardId) => {
@@ -98,10 +114,10 @@ const generateTransactions = (cardId) => {
     const transaction = {
       method,
       amount,
+      cardId,
       recipient: faker.finance.accountName(),
       note: faker.finance.transactionDescription(),
       category,
-      cardId,
     };
 
     transactions.push(transaction);

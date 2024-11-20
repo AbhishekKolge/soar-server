@@ -144,7 +144,7 @@ const getAccount = async (req, res) => {
     .filter({
       search,
     })
-    .filterIn({ bankId })
+    .filterIn({ bankId, userId: user.id })
     .sort(sortMethod)
     .paginate(page)
     .selectWithIncludes(retrieve.account)
@@ -156,6 +156,7 @@ const getAccount = async (req, res) => {
     totalPages,
   });
 };
+
 
 module.exports = {
   addAccount,

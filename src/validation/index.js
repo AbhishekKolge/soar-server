@@ -15,6 +15,7 @@ const {
   updateCreditCardSchema,
   deleteCreditCardSchema,
 } = require("./credit-card");
+const { transferAmountSchema } = require("./transaction");
 const {
   uploadProfileImageSchema,
   removeProfileImageSchema,
@@ -42,4 +43,5 @@ module.exports = {
   addAccountSchema,
   updateAccountSchema,
   deleteAccountSchema,
+  transferAmountSchema,
 };
