@@ -66,6 +66,7 @@ const transaction = {
   recipient: true,
   note: true,
   category: true,
+  accountId: true,
 };
 
 const account = {

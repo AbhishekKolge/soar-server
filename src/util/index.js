@@ -18,6 +18,7 @@ const {
   sendResetPasswordEmail,
   sendVerificationEmail,
   sendLoginAlertNotificationEmail,
+  sendTransactionAlertEmail,
 } = require("./email");
 const { Encrypter } = require("./encrypter");
 const {
@@ -28,6 +29,7 @@ const {
 const { removeQuotes } = require("./format");
 const { hashString, createRandomBytes, createRandomOtp } = require("./hash");
 const { createJWT, isTokenValid, getJWTToken } = require("./jwt");
+const { formatCurrency } = require("./number");
 const passport = require("./passport");
 const { checkPermissions } = require("./permission");
 const { shutdown, start } = require("./process");
@@ -93,4 +95,6 @@ module.exports = {
   QueryBuilder,
   TRANSACTION_METHOD_FORMAT,
   TRANSACTION_CATEGORY_FORMAT,
+  formatCurrency,
+  sendTransactionAlertEmail,
 };
