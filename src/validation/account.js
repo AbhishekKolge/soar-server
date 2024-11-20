@@ -15,6 +15,7 @@ const addAccountSchema = (req, res, next) => {
 
 const updateAccountSchema = (req, res, next) => {
   const schema = Joi.object().keys({
+    imageUrl: Joi.string().trim().allow(null).optional(),
     number: Joi.string().trim().min(16).max(16).optional(),
     name: Joi.string().trim().max(50).min(3).optional(),
     identity: Joi.string().trim().max(50).min(3).allow(null).optional(),
