@@ -9,6 +9,7 @@ const {
   MAX_IMAGE_SIZE,
   TRANSACTION_METHOD_LIST,
   TRANSACTION_CATEGORY_LIST,
+  MAX_CARDS,
 } = require("./default");
 const {
   sendEmail,
@@ -28,6 +29,7 @@ const { createJWT, isTokenValid, getJWTToken } = require("./jwt");
 const passport = require("./passport");
 const { checkPermissions } = require("./permission");
 const { shutdown, start } = require("./process");
+const { QueryBuilder } = require("./query");
 const {
   getOrigin,
   getUserAgent,
@@ -85,4 +87,6 @@ module.exports = {
   Encrypter,
   TRANSACTION_METHOD_LIST,
   TRANSACTION_CATEGORY_LIST,
+  MAX_CARDS,
+  QueryBuilder,
 };

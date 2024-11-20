@@ -12,6 +12,7 @@ const {
   getCreditCard,
   deleteCreditCard,
 } = require("./credit-card");
+const { getTransaction } = require("./transaction");
 const {
   showCurrentUser,
   uploadProfileImage,
@@ -46,4 +47,5 @@ module.exports = {
   updateCreditCard,
   deleteCreditCard,
   getCreditCard,
+  getTransaction,
 };

@@ -20,6 +20,12 @@ class CreditCard {
     return this.model;
   }
 
+  decryptPin() {
+    const decryptedPin = new Encrypter().decrypt(this.model.pin);
+    this.model.pin = decryptedPin;
+    return this.model;
+  }
+
   generateBalance() {
     const minBalance = 1000;
     const maxBalance = 10000;
@@ -64,6 +70,11 @@ class CreditCard {
     if (isExpired) {
       throw new BadRequestError("Card validity expired");
     }
+  }
+
+  setActive() {
+    this.model.isSelected = true;
+    return this.model;
   }
 }
 

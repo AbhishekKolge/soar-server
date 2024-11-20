@@ -21,6 +21,7 @@ const {
   utilsRouter,
   userRouter,
   creditCardRouter,
+  transactionRouter,
 } = require("./route");
 
 cloudinary.config({
@@ -47,6 +48,7 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/utils", utilsRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/credit-card", creditCardRouter);
+app.use("/api/v1/transaction", transactionRouter);
 
 app.use(notFound);
 app.use(errorHandler);
