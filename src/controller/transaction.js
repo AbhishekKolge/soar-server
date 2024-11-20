@@ -1,16 +1,16 @@
 const { StatusCodes } = require("http-status-codes");
 
 const prisma = require("../../prisma/prisma-client");
-const { QueryBuilder } = require("../util");
+const {
+  QueryBuilder,
+  TRANSACTION_METHOD_FORMAT,
+  TRANSACTION_CATEGORY_FORMAT,
+} = require("../util");
 const retrieve = require("../retrieve-schema");
 const { NotFoundError } = require("../error");
 
 const getTransaction = async (req, res) => {
-  const {
-    params: { id: cardId },
-    user,
-    query,
-  } = req;
+  const { user, query } = req;
 
   const {
     page,
@@ -19,18 +19,19 @@ const getTransaction = async (req, res) => {
     nullishSort,
     search,
     category,
+    method,
     accountId,
   } = query;
 
-  const creditCard = await prisma.card.findUnique({
+  const creditCard = await prisma.card.findFirst({
     where: {
-      id: cardId,
       userId: user.id,
+      isSelected: true,
     },
   });
 
   if (!creditCard) {
-    throw new NotFoundError(`No credit card found with id of ${cardId}`);
+    throw new NotFoundError("No active credit card found.");
   }
 
   const queryBuilder = new QueryBuilder({
@@ -40,15 +41,23 @@ const getTransaction = async (req, res) => {
     nullishSort,
   });
 
-  const { results, totalCount, totalPages } = await queryBuilder
+  let { results, totalCount, totalPages } = await queryBuilder
     .filter({
       search,
     })
-    .filterIn({ category, accountId, cardId })
+    .filterIn({ category, method, accountId, cardId: creditCard.id })
     .sort(sortMethod)
     .paginate(page)
     .selectWithIncludes(retrieve.transaction)
     .execute();
+
+  results = results.map((result) => {
+    return {
+      ...result,
+      method: TRANSACTION_METHOD_FORMAT[result.method],
+      category: TRANSACTION_CATEGORY_FORMAT[result.category],
+    };
+  });
 
   res.status(StatusCodes.OK).json({
     results,
