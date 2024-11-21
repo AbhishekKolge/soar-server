@@ -96,21 +96,68 @@ class CreditCard {
   }
 }
 
+const getRandomAmount = () => {
+  const low = Math.random() > 0.5 ? 100 : 10;
+  const high = Math.random() > 0.2 ? 5000 : 10000;
+  return new Decimal(faker.finance.amount(low, high));
+};
+
 const generateTransactions = (cardId) => {
   const numOfTransactions = 1000;
   const transactions = [];
 
-  for (let i = 0; i < numOfTransactions; i++) {
-    const method =
-      TRANSACTION_METHOD_LIST[
-        Math.floor(Math.random() * TRANSACTION_METHOD_LIST.length)
-      ];
-    const category =
-      TRANSACTION_CATEGORY_LIST[
-        Math.floor(Math.random() * TRANSACTION_CATEGORY_LIST.length)
-      ];
+  const getRandomCategoryWeights = () => {
+    const totalWeight = 1;
 
-    const amount = new Decimal(faker.finance.amount());
+    const entertainmentWeight = Math.random() * 0.3 + 0.15;
+    const investmentWeight = Math.random() * 0.2 + 0.1;
+    const billExpenseWeight = Math.random() * 0.2 + 0.1;
+    const othersWeight =
+      totalWeight -
+      (entertainmentWeight + investmentWeight + billExpenseWeight);
+
+    return {
+      ENTERTAINMENT: entertainmentWeight,
+      INVESTMENT: investmentWeight,
+      BILL_EXPENSE: billExpenseWeight,
+      OTHERS: othersWeight,
+    };
+  };
+
+  const methodWeights = {
+    DEBIT: 0.4,
+    CREDIT: 0.3,
+  };
+
+  const getWeightedMethod = () => {
+    const random = Math.random();
+    let cumulativeWeight = 0;
+    for (let method of TRANSACTION_METHOD_LIST) {
+      cumulativeWeight += methodWeights[method] || 0;
+      if (random < cumulativeWeight) {
+        return method;
+      }
+    }
+    return TRANSACTION_METHOD_LIST[0];
+  };
+
+  const getWeightedCategory = (categoryWeights) => {
+    const random = Math.random();
+    let cumulativeWeight = 0;
+    for (let category of TRANSACTION_CATEGORY_LIST) {
+      cumulativeWeight += categoryWeights[category] || 0;
+      if (random < cumulativeWeight) {
+        return category;
+      }
+    }
+    return TRANSACTION_CATEGORY_LIST[0];
+  };
+
+  for (let i = 0; i < numOfTransactions; i++) {
+    const categoryWeights = getRandomCategoryWeights();
+    const method = getWeightedMethod();
+    const category = getWeightedCategory(categoryWeights);
+    const amount = getRandomAmount();
     const createdAt = getRandomDateFromOneYear();
 
     const transaction = {
