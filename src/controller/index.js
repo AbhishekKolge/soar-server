@@ -5,6 +5,11 @@ const {
   getAccount,
 } = require("./account");
 const {
+  getWeeklyActivity,
+  getExpenseStatistics,
+  getBalanceHistory,
+} = require("./analytics");
+const {
   register,
   verify,
   forgotPassword,
@@ -60,4 +65,7 @@ module.exports = {
   deleteAccount,
   getAccount,
   transferAmount,
+  getWeeklyActivity,
+  getExpenseStatistics,
+  getBalanceHistory,
 };

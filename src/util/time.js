@@ -27,9 +27,24 @@ const getCodeExpirationTimeOffset = () => {
   return new Date(Date.now() + 1000 * 60 * 10);
 };
 
+const getRandomDateFromOneYear = () => {
+  const randomDaysAgo = Math.floor(Math.random() * 365);
+  const date = new Date();
+  date.setDate(date.getDate() - randomDaysAgo);
+  return date;
+};
+
+const getDaysAgo = (days) => {
+  const day = new Date();
+  day.setDate(day.getDate() - days);
+  return day;
+};
+
 module.exports = {
   currentTime,
   checkTimeExpired,
   time,
   getCodeExpirationTimeOffset,
+  getRandomDateFromOneYear,
+  getDaysAgo,
 };
