@@ -4,6 +4,7 @@ const utilsRouter = require("./utils");
 const creditCardRouter = require("./credit-card");
 const transactionRouter = require("./transaction");
 const accountRouter = require("./account");
+const analyticsRouter = require("./analytics");
 
 module.exports = {
   authRouter,
@@ -12,4 +13,5 @@ module.exports = {
   creditCardRouter,
   transactionRouter,
   accountRouter,
+  analyticsRouter,
 };

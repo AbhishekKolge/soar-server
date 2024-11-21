@@ -45,6 +45,8 @@ const {
   checkTimeExpired,
   time,
   getCodeExpirationTimeOffset,
+  getRandomDateFromOneYear,
+  getDaysAgo,
 } = require("./time");
 const { createTokenUser } = require("./user");
 const { joiPassword, joiContactNo } = require("./validation");
@@ -97,4 +99,6 @@ module.exports = {
   TRANSACTION_CATEGORY_FORMAT,
   formatCurrency,
   sendTransactionAlertEmail,
+  getRandomDateFromOneYear,
+  getDaysAgo,
 };

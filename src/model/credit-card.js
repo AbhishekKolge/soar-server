@@ -5,6 +5,7 @@ const {
   checkTimeExpired,
   TRANSACTION_METHOD_LIST,
   TRANSACTION_CATEGORY_LIST,
+  getRandomDateFromOneYear,
 } = require("../util");
 const { faker } = require("@faker-js/faker");
 
@@ -96,7 +97,7 @@ class CreditCard {
 }
 
 const generateTransactions = (cardId) => {
-  const numOfTransactions = 50;
+  const numOfTransactions = 1000;
   const transactions = [];
 
   for (let i = 0; i < numOfTransactions; i++) {
@@ -110,6 +111,7 @@ const generateTransactions = (cardId) => {
       ];
 
     const amount = new Decimal(faker.finance.amount());
+    const createdAt = getRandomDateFromOneYear();
 
     const transaction = {
       method,
@@ -118,6 +120,7 @@ const generateTransactions = (cardId) => {
       recipient: faker.finance.accountName(),
       note: faker.finance.transactionDescription(),
       category,
+      createdAt: createdAt.toISOString(),
     };
 
     transactions.push(transaction);
