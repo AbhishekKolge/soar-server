@@ -128,50 +128,172 @@ pnpm run seed
 
 ## API Documentation
 
-### Auth Routes
+### Postman Collection
+
+You can access and test all API endpoints using our Postman collection:
+
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://api.postman.com/collections/17221325-7ee8ff39-d4c2-4349-9903-d71a269faef1?access_key=PMAT-01JD8AN5WTMT2A8GNWHZMHW8R2)
+
+### Available Endpoints
+
+#### Auth Routes
 - `POST /api/v1/auth/register` - Register a new user
+  - Body: `{ name, username, email, password, dob, contactNumber }`
+  - Returns: User object with token
+
 - `POST /api/v1/auth/verify` - Verify user email
+  - Body: `{ verificationCode }`
+  - Returns: Success message
+
 - `POST /api/v1/auth/forgot-password` - Initiate forgot password process
+  - Body: `{ email }`
+  - Returns: Success message
+
 - `POST /api/v1/auth/reset-password` - Reset the user's password
+  - Body: `{ resetPasswordCode, password }`
+  - Returns: Success message
+
 - `POST /api/v1/auth/login` - Login with credentials
+  - Body: `{ email, password }`
+  - Returns: User object with token
+
 - `GET /api/v1/auth/google` - Initiate Google OAuth2 authentication
 - `GET /api/v1/auth/google/callback` - Google OAuth2 callback
 
-### User Routes
+#### User Routes
 - `GET /api/v1/user/show-me` - Get current user's details
+  - Headers: `Authorization: Bearer <token>`
+  - Returns: User profile details
+
 - `POST /api/v1/user/profile-image` - Upload profile image
+  - Headers: `Authorization: Bearer <token>`
+  - Body: Form data with image file
+  - Returns: Updated user object
+
 - `DELETE /api/v1/user/profile-image` - Remove profile image
+  - Headers: `Authorization: Bearer <token>`
+  - Returns: Success message
+
 - `PATCH /api/v1/user/` - Update user details
+  - Headers: `Authorization: Bearer <token>`
+  - Body: Updated user fields
+  - Returns: Updated user object
+
 - `DELETE /api/v1/user/` - Delete user account
+  - Headers: `Authorization: Bearer <token>`
+  - Returns: Success message
+
+#### Security Settings
 - `GET /api/v1/user/security` - Get security settings
+  - Headers: `Authorization: Bearer <token>`
+  - Returns: Security settings object
+
 - `PATCH /api/v1/user/security` - Update security settings
+  - Headers: `Authorization: Bearer <token>`
+  - Body: `{ twoFactorAuth }`
+  - Returns: Updated security settings
+
+#### Preferences
 - `GET /api/v1/user/preference` - Get preferences
+  - Headers: `Authorization: Bearer <token>`
+  - Returns: User preferences
+
 - `PATCH /api/v1/user/preference` - Update preferences
+  - Headers: `Authorization: Bearer <token>`
+  - Body: Updated preference fields
+  - Returns: Updated preferences
 
-### Account Routes
+#### Account Routes
 - `GET /api/v1/account` - Get account details
+  - Headers: `Authorization: Bearer <token>`
+  - Returns: Array of user accounts
+
 - `POST /api/v1/account` - Add new account
+  - Headers: `Authorization: Bearer <token>`
+  - Body: `{ number, name, bankId }`
+  - Returns: Created account object
+
 - `PATCH /api/v1/account/:id` - Update account
+  - Headers: `Authorization: Bearer <token>`
+  - Params: `id` - Account ID
+  - Body: Updated account fields
+  - Returns: Updated account object
+
 - `DELETE /api/v1/account/:id` - Delete account
+  - Headers: `Authorization: Bearer <token>`
+  - Params: `id` - Account ID
+  - Returns: Success message
 
-### Credit Card Routes
+#### Credit Card Routes
 - `GET /api/v1/credit-card` - Get credit card details
+  - Headers: `Authorization: Bearer <token>`
+  - Returns: Array of user credit cards
+
 - `POST /api/v1/credit-card` - Add new credit card
+  - Headers: `Authorization: Bearer <token>`
+  - Body: `{ number, name, validity, pin }`
+  - Returns: Created card object
+
 - `PATCH /api/v1/credit-card/:id` - Update credit card
+  - Headers: `Authorization: Bearer <token>`
+  - Params: `id` - Card ID
+  - Body: Updated card fields
+  - Returns: Updated card object
+
 - `DELETE /api/v1/credit-card/:id` - Delete credit card
+  - Headers: `Authorization: Bearer <token>`
+  - Params: `id` - Card ID
+  - Returns: Success message
 
-### Transaction Routes
+#### Transaction Routes
 - `GET /api/v1/transaction` - Get transaction history
+  - Headers: `Authorization: Bearer <token>`
+  - Query Params: 
+    - `page` (optional) - Page number
+    - `limit` (optional) - Items per page
+  - Returns: Paginated transaction list
+
 - `POST /api/v1/transaction/transfer/:id` - Transfer amount
+  - Headers: `Authorization: Bearer <token>`
+  - Params: `id` - Card or Account ID
+  - Body: `{ amount, recipient, note, category }`
+  - Returns: Transaction details
 
-### Analytics Routes
+#### Analytics Routes
 - `GET /api/v1/analytics/activity` - Get weekly activity
-- `GET /api/v1/analytics/expense` - Get expense statistics
-- `GET /api/v1/analytics/balance` - Get balance history
+  - Headers: `Authorization: Bearer <token>`
+  - Returns: Weekly activity statistics
 
-### Utils Routes
+- `GET /api/v1/analytics/expense` - Get expense statistics
+  - Headers: `Authorization: Bearer <token>`
+  - Returns: Expense breakdown by category
+
+- `GET /api/v1/analytics/balance` - Get balance history
+  - Headers: `Authorization: Bearer <token>`
+  - Returns: Historical balance data
+
+#### Utils Routes
 - `GET /api/v1/utils/countries` - Get countries list
+  - Returns: Array of countries
+
 - `GET /api/v1/utils/banks` - Get banks list
+  - Returns: Array of banks
+
+### Authentication
+
+All protected routes require a JWT token in the Authorization header:
+```
+Authorization: Bearer <your_jwt_token>
+```
+
+Common HTTP status codes:
+- 200: Success
+- 201: Created
+- 400: Bad Request
+- 401: Unauthorized
+- 403: Forbidden
+- 404: Not Found
+- 500: Internal Server Error
 
 ## Database
 
