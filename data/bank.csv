@@ -1,4 +1,4 @@
-Bank Name,City,ST,CERT,Acquiring Institution,Closing Date,Updated Date
+BankName,City,ST,CERT,AcquiringInstitution,ClosingDate,UpdatedDate
 Fayette County Bank,Saint Elmo,IL,1802,"United Fidelity Bank, fsb",26-May-17,26-Jul-17
 "Guaranty Bank, (d/b/a BestBank in Georgia & Michigan) ",Milwaukee,WI,30003,First-Citizens Bank & Trust Company,5-May-17,26-Jul-17
 First NBC Bank,New Orleans,LA,58302,Whitney Bank,28-Apr-17,26-Jul-17
