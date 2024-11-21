@@ -25,8 +25,13 @@ const register = async (req, res) => {
   const verificationCode = createRandomOtp();
   console.log({ verificationCode });
 
+  const { contactCountryId, ...userDetails } = req.body;
+
   const userModel = new User({
-    ...req.body,
+    ...userDetails,
+    contactCountry: {
+      connect: { id: contactCountryId },
+    },
     verificationCode: hashString(verificationCode),
     verificationCodeExpiration: getCodeExpirationTimeOffset(),
     loginMethod: LOGIN_METHOD.normal,
