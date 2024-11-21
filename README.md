@@ -156,9 +156,7 @@ This diagram shows:
 
 ### Postman Collection
 
-You can access and test all API endpoints using our Postman collection:
-
-[![Run in Postman](https://run.pstmn.io/button.svg)](https://api.postman.com/collections/17221325-7ee8ff39-d4c2-4349-9903-d71a269faef1?access_key=PMAT-01JD8AN5WTMT2A8GNWHZMHW8R2)
+[![View API Documentation](https://run.pstmn.io/button.svg)](https://documenter.getpostman.com/view/17221325/2sAYBSkYh2)
 
 ### Available Endpoints
 
