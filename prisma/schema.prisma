@@ -15,7 +15,7 @@ model User {
   password                    String?
   dob                         DateTime?    @db.Timestamptz
   contactNumber               String?      @unique
-  contactCountry              Country?     @relation(fields: [contactCountryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  contactCountry              Country?     @relation(fields: [contactCountryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   contactCountryId            String?
   loginMethod                 LoginMethod
   profileImageUrl             String?
@@ -28,11 +28,11 @@ model User {
   resetPasswordCodeExpiration DateTime?    @db.Timestamptz
   createdAt                   DateTime     @default(now()) @db.Timestamptz
   updatedAt                   DateTime     @updatedAt @db.Timestamptz
-  address                     Address      @relation(fields: [addressId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  address                     Address      @relation(fields: [addressId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   addressId                   String       @unique
-  notification                Notification @relation(fields: [notificationId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  notification                Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   notificationId              String       @unique
-  security                    Security     @relation(fields: [securityId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  security                    Security     @relation(fields: [securityId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   securityId                  String       @unique
   cards                       Card[]
   accounts                    Account[]
@@ -44,7 +44,7 @@ model Address {
   permanent  String?
   city       String?
   postalCode String?
-  country    Country? @relation(fields: [countryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  country    Country? @relation(fields: [countryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   countryId  String?
   createdAt  DateTime @default(now()) @db.Timestamptz
   updatedAt  DateTime @updatedAt @db.Timestamptz
@@ -88,7 +88,7 @@ model Card {
   updatedAt    DateTime      @updatedAt @db.Timestamptz
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId       String
-  balance      Balance       @relation(fields: [balanceId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  balance      Balance       @relation(fields: [balanceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   balanceId    String        @unique
   transactions Transaction[]
 
@@ -112,7 +112,7 @@ model Account {
   updatedAt    DateTime      @updatedAt @db.Timestamptz
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId       String
-  bank         Bank          @relation(fields: [bankId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  bank         Bank          @relation(fields: [bankId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   bankId       String
   transactions Transaction[]
 

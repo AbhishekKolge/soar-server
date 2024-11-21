@@ -28,9 +28,17 @@ const getCodeExpirationTimeOffset = () => {
 };
 
 const getRandomDateFromOneYear = () => {
+
   const randomDaysAgo = Math.floor(Math.random() * 365);
   const date = new Date();
   date.setDate(date.getDate() - randomDaysAgo);
+
+  const randomHours = Math.floor(Math.random() * 24);
+  const randomMinutes = Math.floor(Math.random() * 60);
+  const randomSeconds = Math.floor(Math.random() * 60);
+
+  date.setHours(randomHours, randomMinutes, randomSeconds);
+
   return date;
 };
 
