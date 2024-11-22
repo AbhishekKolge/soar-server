@@ -5,7 +5,12 @@ const {
   checkTimeExpired,
   TRANSACTION_METHOD_LIST,
   TRANSACTION_CATEGORY_LIST,
-  getRandomDateFromOneYear,
+  TRANSACTION_METHOD,
+  getIncrementingShuffledDays,
+  MAX_TRANSACTIONS_PER_MONTH,
+  STARTING_BALANCE,
+  generateRandomAmount,
+  getRandomNumber,
 } = require("../util");
 const { faker } = require("@faker-js/faker");
 
@@ -96,81 +101,107 @@ class CreditCard {
   }
 }
 
-const getRandomAmount = () => {
-  const low = Math.random() > 0.5 ? 100 : 10;
-  const high = Math.random() > 0.2 ? 5000 : 10000;
-  return new Decimal(faker.finance.amount(low, high));
+const generateTransactions = (cardId) => {
+  const currentDate = new Date();
+  const startDate = new Date();
+  startDate.setMonth(currentDate.getMonth() - 5);
+
+  let transactions = [];
+
+  for (let month = 0; month < 6; month++) {
+    const monthStartDate = new Date(startDate);
+    monthStartDate.setMonth(startDate.getMonth() + month);
+    monthStartDate.setDate(1);
+
+    let monthEndDate = new Date(monthStartDate);
+    monthEndDate.setMonth(monthStartDate.getMonth() + 1);
+    monthEndDate.setDate(0);
+
+    if (month === 5) {
+      monthEndDate = new Date(currentDate);
+      monthEndDate.setHours(currentDate.getHours() - 2);
+      monthEndDate.setMinutes(0);
+      monthEndDate.setSeconds(0);
+      monthEndDate.setMilliseconds(0);
+    }
+
+    const monthTransaction = generateTransactionForMonth({
+      monthStartDate,
+      monthEndDate,
+      cardId,
+    });
+
+    transactions.push(...monthTransaction);
+  }
+
+  return transactions;
 };
 
-const generateTransactions = (cardId) => {
-  const numOfTransactions = 1000;
-  const transactions = [];
+const generateTransactionForMonth = ({
+  monthStartDate,
+  monthEndDate,
+  cardId,
+}) => {
+  let currentBalance = STARTING_BALANCE;
+  let transactions = [];
+  let daysInMonth = [];
+  let currentDate = new Date(monthStartDate);
 
-  const getRandomCategoryWeights = () => {
-    const totalWeight = 1;
+  while (currentDate <= monthEndDate) {
+    daysInMonth.push(new Date(currentDate));
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
 
-    const entertainmentWeight = Math.random() * 0.3 + 0.15;
-    const investmentWeight = Math.random() * 0.2 + 0.1;
-    const billExpenseWeight = Math.random() * 0.2 + 0.1;
-    const othersWeight =
-      totalWeight -
-      (entertainmentWeight + investmentWeight + billExpenseWeight);
+  let selectedDays = getIncrementingShuffledDays(
+    daysInMonth,
+    MAX_TRANSACTIONS_PER_MONTH
+  );
 
-    return {
-      ENTERTAINMENT: entertainmentWeight,
-      INVESTMENT: investmentWeight,
-      BILL_EXPENSE: billExpenseWeight,
-      OTHERS: othersWeight,
-    };
-  };
+  for (let i = 0; i < selectedDays.length; i++) {
+    const date = new Date(selectedDays[i]);
+    date.setHours(date.getHours() + Math.floor(Math.random() * 5) + 1);
+    date.setMinutes(date.getMinutes() + Math.floor(Math.random() * 60));
 
-  const methodWeights = {
-    DEBIT: 0.4,
-    CREDIT: 0.3,
-  };
+    const transactionLimit = getRandomNumber(2, 5);
 
-  const getWeightedMethod = () => {
-    const random = Math.random();
-    let cumulativeWeight = 0;
-    for (let method of TRANSACTION_METHOD_LIST) {
-      cumulativeWeight += methodWeights[method] || 0;
-      if (random < cumulativeWeight) {
-        return method;
+    for (let j = 0; j < transactionLimit; j++) {
+      let fallbackBalance = currentBalance;
+      const method =
+        TRANSACTION_METHOD_LIST[
+          Math.floor(Math.random() * TRANSACTION_METHOD_LIST.length)
+        ];
+      const category =
+        TRANSACTION_CATEGORY_LIST[
+          Math.floor(Math.random() * TRANSACTION_CATEGORY_LIST.length)
+        ];
+
+      const amount = generateRandomAmount(500, 2000, 2);
+
+      if (method === TRANSACTION_METHOD.credit) {
+        currentBalance = currentBalance + parseFloat(amount);
+      }
+      if (method === TRANSACTION_METHOD.debit) {
+        currentBalance = currentBalance - parseFloat(amount);
+      }
+      if (currentBalance <= STARTING_BALANCE && currentBalance >= 0) {
+        transactions.push({
+          method,
+          amount: new Decimal(amount),
+          balance: new Encrypter().encrypt(
+            currentBalance.toFixed(2).toString()
+          ),
+          cardId,
+          recipient: faker.finance.accountName(),
+          note: faker.finance.transactionDescription(),
+          category,
+          createdAt: date.toISOString(),
+        });
+        date.setHours(date.getHours() + Math.floor(Math.random() * 5) + 1);
+        date.setMinutes(date.getMinutes() + Math.floor(Math.random() * 60));
+      } else {
+        currentBalance = fallbackBalance;
       }
     }
-    return TRANSACTION_METHOD_LIST[0];
-  };
-
-  const getWeightedCategory = (categoryWeights) => {
-    const random = Math.random();
-    let cumulativeWeight = 0;
-    for (let category of TRANSACTION_CATEGORY_LIST) {
-      cumulativeWeight += categoryWeights[category] || 0;
-      if (random < cumulativeWeight) {
-        return category;
-      }
-    }
-    return TRANSACTION_CATEGORY_LIST[0];
-  };
-
-  for (let i = 0; i < numOfTransactions; i++) {
-    const categoryWeights = getRandomCategoryWeights();
-    const method = getWeightedMethod();
-    const category = getWeightedCategory(categoryWeights);
-    const amount = getRandomAmount();
-    const createdAt = getRandomDateFromOneYear();
-
-    const transaction = {
-      method,
-      amount,
-      cardId,
-      recipient: faker.finance.accountName(),
-      note: faker.finance.transactionDescription(),
-      category,
-      createdAt: createdAt.toISOString(),
-    };
-
-    transactions.push(transaction);
   }
 
   return transactions;

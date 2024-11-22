@@ -17,20 +17,24 @@ const getWeeklyActivity = async (req, res) => {
   }
 
   const activity = await prisma.$queryRaw`
+    WITH last_seven_days AS (
+      SELECT CURRENT_DATE - INTERVAL '1 day' * s.i AS day
+      FROM generate_series(0, 6) AS s(i)
+    )
     SELECT 
-        TO_CHAR("createdAt", 'YYYY-MM-DD') AS day,
-        SUM(CASE WHEN method = 'DEBIT' THEN amount ELSE 0 END) AS debit,
-        SUM(CASE WHEN method = 'CREDIT' THEN amount ELSE 0 END) AS credit
+      TO_CHAR(day, 'YYYY-MM-DD') AS day,
+      COALESCE(SUM(CASE WHEN method = 'DEBIT' THEN amount ELSE 0 END), 0) AS debit,
+      COALESCE(SUM(CASE WHEN method = 'CREDIT' THEN amount ELSE 0 END), 0) AS credit
     FROM 
-        "Transaction"
-    WHERE 
-        "createdAt" >= CURRENT_DATE - INTERVAL '6 days'
-        AND "cardId" = ${creditCard.id}
+      last_seven_days
+    LEFT JOIN "Transaction" 
+      ON TO_CHAR("Transaction"."createdAt", 'YYYY-MM-DD') = TO_CHAR(last_seven_days.day, 'YYYY-MM-DD')
+      AND "Transaction"."cardId" = ${creditCard.id}
     GROUP BY 
-        day
+      day
     ORDER BY 
-        day ASC;
-`;
+      day ASC;
+  `;
 
   res.status(StatusCodes.OK).json({ activity });
 };
@@ -80,57 +84,30 @@ const getBalanceHistory = async (req, res) => {
     throw new NotFoundError("No active credit card found.");
   }
 
-  const startDate = new Date();
-  startDate.setFullYear(startDate.getFullYear() - 1);
+  const transactions = await prisma.$queryRaw`
+  WITH MonthlyTransactions AS (
+    SELECT 
+      *,
+      ROW_NUMBER() OVER (
+        PARTITION BY DATE_TRUNC('month', "createdAt") 
+        ORDER BY "createdAt" DESC
+      ) AS rank
+    FROM "Transaction"
+    WHERE 
+      "createdAt" >= NOW() - INTERVAL '6 months' 
+      AND "cardId" = ${creditCard.id}
+  )
+  SELECT * 
+  FROM MonthlyTransactions
+  WHERE rank = 1;
+`;
 
-  const transactions = await prisma.transaction.findMany({
-    where: {
-      cardId: creditCard.id,
-      createdAt: {
-        gte: startDate,
-      },
-    },
-    orderBy: {
-      createdAt: "asc",
-    },
+  const balance = transactions.map((transaction) => {
+    return {
+      date: transaction.createdAt,
+      balance: new Encrypter().decrypt(transaction.balance),
+    };
   });
-
-  let currentBalance =
-    (
-      await prisma.balance.findFirst({
-        where: { card: { id: creditCard.id } },
-      })
-    )?.amount || "0";
-
-  currentBalance = parseFloat(
-    new Encrypter().decrypt(currentBalance.toString())
-  );
-
-  const getMonthStartDate = (date) => {
-    const d = new Date(date);
-    return new Date(d.getFullYear(), d.getMonth(), 1)
-      .toISOString()
-      .split("T")[0];
-  };
-
-  let balance = [];
-  let monthBalances = {};
-
-  transactions.forEach((transaction) => {
-    const monthStartDate = getMonthStartDate(transaction.createdAt);
-
-    if (!monthBalances[monthStartDate]) {
-      monthBalances[monthStartDate] = currentBalance;
-    }
-    monthBalances[monthStartDate] += parseFloat(transaction.amount.toString());
-  });
-
-  balance = Object.keys(monthBalances)
-    .map((month) => ({
-      date: month,
-      balance: monthBalances[month],
-    }))
-    .sort((a, b) => (a.date > b.date ? 1 : -1));
 
   res.status(StatusCodes.OK).json({ balance });
 };

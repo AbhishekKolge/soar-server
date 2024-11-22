@@ -29,13 +29,16 @@ const register = async (req, res) => {
 
   const userModel = new User({
     ...userDetails,
-    contactCountry: {
-      connect: { id: contactCountryId },
-    },
     verificationCode: hashString(verificationCode),
     verificationCodeExpiration: getCodeExpirationTimeOffset(),
     loginMethod: LOGIN_METHOD.normal,
   });
+
+  if (contactCountryId) {
+    userModel.contactCountry = {
+      connect: { id: contactCountryId },
+    };
+  }
 
   await userModel.encryptPassword();
   userModel.createPreference();

@@ -7,7 +7,6 @@ const checkTimeExpired = (timeArg) => {
   return new Date(timeArg).getTime() - minute < Date.now();
 };
 
-
 const time = (timeArg) => {
   const options = {
     weekday: "long",
@@ -21,7 +20,6 @@ const time = (timeArg) => {
   };
   return new Date(timeArg).toLocaleDateString(undefined, options);
 };
-
 
 const getCodeExpirationTimeOffset = () => {
   return new Date(Date.now() + 1000 * 60 * 10);
@@ -54,6 +52,28 @@ const getDaysAgo = (days) => {
   return day;
 };
 
+const getIncrementingShuffledDays = (daysInMonth, maxTransactions) => {
+  let selectedDays = [];
+
+  let interval = Math.floor(daysInMonth.length / maxTransactions);
+
+  for (let i = 0; i < maxTransactions; i++) {
+    let startIdx = i * interval;
+    let endIdx = startIdx + interval;
+
+    if (i === maxTransactions - 1) {
+      endIdx = daysInMonth.length;
+    }
+
+    let randomIdx = Math.floor(Math.random() * (endIdx - startIdx)) + startIdx;
+    selectedDays.push(daysInMonth[randomIdx]);
+  }
+
+  selectedDays.sort((a, b) => a - b);
+
+  return selectedDays;
+};
+
 module.exports = {
   currentTime,
   checkTimeExpired,
@@ -61,4 +81,5 @@ module.exports = {
   getCodeExpirationTimeOffset,
   getRandomDateFromOneYear,
   getDaysAgo,
+  getIncrementingShuffledDays,
 };

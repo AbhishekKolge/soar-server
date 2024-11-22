@@ -12,6 +12,8 @@ const {
   MAX_CARDS,
   TRANSACTION_METHOD_FORMAT,
   TRANSACTION_CATEGORY_FORMAT,
+  MAX_TRANSACTIONS_PER_MONTH,
+  STARTING_BALANCE,
 } = require("./default");
 const {
   sendEmail,
@@ -29,7 +31,11 @@ const {
 const { removeQuotes } = require("./format");
 const { hashString, createRandomBytes, createRandomOtp } = require("./hash");
 const { createJWT, isTokenValid, getJWTToken } = require("./jwt");
-const { formatCurrency } = require("./number");
+const {
+  formatCurrency,
+  generateRandomAmount,
+  getRandomNumber,
+} = require("./number");
 const passport = require("./passport");
 const { checkPermissions } = require("./permission");
 const { shutdown, start } = require("./process");
@@ -47,6 +53,7 @@ const {
   getCodeExpirationTimeOffset,
   getRandomDateFromOneYear,
   getDaysAgo,
+  getIncrementingShuffledDays,
 } = require("./time");
 const { createTokenUser } = require("./user");
 const { joiPassword, joiContactNo } = require("./validation");
@@ -101,4 +108,9 @@ module.exports = {
   sendTransactionAlertEmail,
   getRandomDateFromOneYear,
   getDaysAgo,
+  getIncrementingShuffledDays,
+  MAX_TRANSACTIONS_PER_MONTH,
+  STARTING_BALANCE,
+  generateRandomAmount,
+  getRandomNumber,
 };

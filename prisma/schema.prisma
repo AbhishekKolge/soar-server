@@ -129,6 +129,7 @@ model Transaction {
   id        String              @id @default(uuid())
   method    TransactionMethod
   amount    Decimal
+  balance   String
   card      Card                @relation(fields: [cardId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   cardId    String
   createdAt DateTime            @default(now()) @db.Timestamptz
