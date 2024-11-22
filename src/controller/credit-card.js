@@ -1,6 +1,7 @@
 const { StatusCodes } = require("http-status-codes");
 
 const prisma = require("../../prisma/prisma-client");
+import { Prisma } from "@prisma/client";
 const { CreditCard, generateTransactions } = require("../model");
 const retrieve = require("../retrieve-schema");
 const { NotFoundError, BadRequestError } = require("../error");
@@ -59,7 +60,7 @@ const addCreditCard = async (req, res) => {
     {
       timeout: 120000,
       maxWait: 120000,
-      isolationLevel: prisma.TransactionIsolationLevel.Serializable,
+      isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
     }
   );
 
