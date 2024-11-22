@@ -1,13 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 
-const prisma =
-  global.prisma ||
-  new PrismaClient({
-    transactionOptions: {
-      maxWait: 8000,
-      timeout: 10000,
-    },
-  });
+const prisma = global.prisma || new PrismaClient();
 
 global.prisma = prisma;
 
