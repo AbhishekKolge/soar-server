@@ -12,7 +12,6 @@ const {
   MAX_CARDS,
   TRANSACTION_METHOD_FORMAT,
   TRANSACTION_CATEGORY_FORMAT,
-  MAX_TRANSACTIONS_PER_MONTH,
   STARTING_BALANCE,
 } = require("./default");
 const {
@@ -53,7 +52,6 @@ const {
   getCodeExpirationTimeOffset,
   getRandomDateFromOneYear,
   getDaysAgo,
-  getIncrementingShuffledDays,
 } = require("./time");
 const { createTokenUser } = require("./user");
 const { joiPassword, joiContactNo } = require("./validation");
@@ -108,8 +106,6 @@ module.exports = {
   sendTransactionAlertEmail,
   getRandomDateFromOneYear,
   getDaysAgo,
-  getIncrementingShuffledDays,
-  MAX_TRANSACTIONS_PER_MONTH,
   STARTING_BALANCE,
   generateRandomAmount,
   getRandomNumber,
