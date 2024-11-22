@@ -62,6 +62,7 @@ const transaction = {
   id: true,
   method: true,
   amount: true,
+  balance: true,
   createdAt: true,
   recipient: true,
   note: true,

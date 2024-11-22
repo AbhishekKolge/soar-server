@@ -45,6 +45,15 @@ const addCreditCard = async (req, res) => {
     await tx.transaction.createMany({
       data: transactions,
     });
+
+    await tx.balance.update({
+      where: {
+        id: creditCard.balanceId,
+      },
+      data: {
+        amount: transactions[transactions.length - 1].balance,
+      },
+    });
   });
 
   res.status(StatusCodes.CREATED).json({

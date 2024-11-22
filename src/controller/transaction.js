@@ -62,6 +62,7 @@ const getTransaction = async (req, res) => {
       ...result,
       method: TRANSACTION_METHOD_FORMAT[result.method],
       category: TRANSACTION_CATEGORY_FORMAT[result.category],
+      balance: new Encrypter().decrypt(result.balance),
     };
   });
 
