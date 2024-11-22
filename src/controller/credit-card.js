@@ -1,6 +1,7 @@
 const { StatusCodes } = require("http-status-codes");
 
 const prisma = require("../../prisma/prisma-client");
+const { Prisma } = require("@prisma/client");
 const { CreditCard, generateTransactions } = require("../model");
 const retrieve = require("../retrieve-schema");
 const { NotFoundError, BadRequestError } = require("../error");
@@ -28,31 +29,49 @@ const addCreditCard = async (req, res) => {
     creditCardModel.setActive();
   }
 
-  if (creditCardModel.model.isSelected) {
-    await prisma.card.updateMany({
-      where: { isSelected: true, userId: id },
-      data: { isSelected: false },
-    });
-  }
+  await prisma.$transaction(
+    async (tx) => {
+      if (creditCardModel.model.isSelected) {
+        await tx.card.updateMany({
+          where: { isSelected: true, userId: id },
+          data: { isSelected: false },
+        });
+      }
 
-  const creditCard = await prisma.card.create({
-    data: creditCardModel.model,
-  });
+      const creditCard = await tx.card.create({
+        data: creditCardModel.model,
+      });
 
-  const transactions = generateTransactions(creditCard.id);
+      const transactions = generateTransactions(creditCard.id);
 
-  await prisma.transaction.createMany({
-    data: transactions,
-  });
+      await tx.transaction.createMany({
+        data: transactions,
+      });
 
-  await prisma.balance.update({
-    where: {
-      id: creditCard.balanceId,
+      const lastTransaction = await tx.transaction.findFirst({
+        where: {
+          cardId: creditCard.id,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+
+      await tx.balance.update({
+        where: {
+          id: creditCard.balanceId,
+        },
+        data: {
+          amount: lastTransaction.balance,
+        },
+      });
     },
-    data: {
-      amount: transactions[transactions.length - 1].balance,
-    },
-  });
+    {
+      timeout: 120000,
+      maxWait: 120000,
+      isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+    }
+  );
 
   res.status(StatusCodes.CREATED).json({
     msg: "Credit card added successfully",
