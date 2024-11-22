@@ -1,7 +1,7 @@
 const { StatusCodes } = require("http-status-codes");
 
 const prisma = require("../../prisma/prisma-client");
-import { Prisma } from "@prisma/client";
+const { Prisma } = require("@prisma/client");
 const { CreditCard, generateTransactions } = require("../model");
 const retrieve = require("../retrieve-schema");
 const { NotFoundError, BadRequestError } = require("../error");
