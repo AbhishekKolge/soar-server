@@ -124,8 +124,6 @@ CREATE TABLE "Account" (
 CREATE TABLE "Bank" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "logoUrl" TEXT NOT NULL,
-    "logoId" TEXT NOT NULL,
 
     CONSTRAINT "Bank_pkey" PRIMARY KEY ("id")
 );
@@ -135,11 +133,12 @@ CREATE TABLE "Transaction" (
     "id" TEXT NOT NULL,
     "method" "TransactionMethod" NOT NULL,
     "amount" DECIMAL(65,30) NOT NULL,
+    "balance" TEXT NOT NULL,
     "cardId" TEXT NOT NULL,
     "createdAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "accountId" TEXT,
     "recipient" TEXT NOT NULL,
-    "note" TEXT NOT NULL,
+    "note" TEXT,
     "category" "TransactionCategory" NOT NULL DEFAULT 'OTHERS',
 
     CONSTRAINT "Transaction_pkey" PRIMARY KEY ("id")
@@ -176,37 +175,43 @@ CREATE UNIQUE INDEX "Card_number_key" ON "Card"("number");
 CREATE UNIQUE INDEX "Card_balanceId_key" ON "Card"("balanceId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Card_number_userId_key" ON "Card"("number", "userId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Account_number_key" ON "Account"("number");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Account_number_userId_key" ON "Account"("number", "userId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Bank_name_key" ON "Bank"("name");
 
 -- AddForeignKey
-ALTER TABLE "User" ADD CONSTRAINT "User_contactCountryId_fkey" FOREIGN KEY ("contactCountryId") REFERENCES "Country"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "User" ADD CONSTRAINT "User_contactCountryId_fkey" FOREIGN KEY ("contactCountryId") REFERENCES "Country"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "User" ADD CONSTRAINT "User_addressId_fkey" FOREIGN KEY ("addressId") REFERENCES "Address"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "User" ADD CONSTRAINT "User_addressId_fkey" FOREIGN KEY ("addressId") REFERENCES "Address"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "User" ADD CONSTRAINT "User_notificationId_fkey" FOREIGN KEY ("notificationId") REFERENCES "Notification"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "User" ADD CONSTRAINT "User_notificationId_fkey" FOREIGN KEY ("notificationId") REFERENCES "Notification"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "User" ADD CONSTRAINT "User_securityId_fkey" FOREIGN KEY ("securityId") REFERENCES "Security"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "User" ADD CONSTRAINT "User_securityId_fkey" FOREIGN KEY ("securityId") REFERENCES "Security"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Address" ADD CONSTRAINT "Address_countryId_fkey" FOREIGN KEY ("countryId") REFERENCES "Country"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Address" ADD CONSTRAINT "Address_countryId_fkey" FOREIGN KEY ("countryId") REFERENCES "Country"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Card" ADD CONSTRAINT "Card_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Card" ADD CONSTRAINT "Card_balanceId_fkey" FOREIGN KEY ("balanceId") REFERENCES "Balance"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Card" ADD CONSTRAINT "Card_balanceId_fkey" FOREIGN KEY ("balanceId") REFERENCES "Balance"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Account" ADD CONSTRAINT "Account_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Account" ADD CONSTRAINT "Account_bankId_fkey" FOREIGN KEY ("bankId") REFERENCES "Bank"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Account" ADD CONSTRAINT "Account_bankId_fkey" FOREIGN KEY ("bankId") REFERENCES "Bank"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_cardId_fkey" FOREIGN KEY ("cardId") REFERENCES "Card"("id") ON DELETE CASCADE ON UPDATE CASCADE;
