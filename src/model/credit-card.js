@@ -102,7 +102,7 @@ class CreditCard {
 const generateTransactions = (cardId) => {
   const currentDate = new Date();
   const startDate = new Date(currentDate);
-  startDate.setMonth(currentDate.getMonth() - 5);
+  startDate.setMonth(currentDate.getMonth() - 1);
   startDate.setDate(1);
   startDate.setHours(0, 0, 0, 0);
 
