@@ -112,6 +112,8 @@ const transferAmount = async (req, res) => {
   creditCardModel.comparePin(body.pin);
   creditCardModel.decryptBalance();
   creditCardModel.validateTransfer(body.amount);
+  const balance = creditCardModel.getRemainingBalance(body.amount);
+  const encryptedBalance = new Encrypter().encrypt(balance.toString());
 
   await prisma.transaction.create({
     data: {
@@ -121,17 +123,16 @@ const transferAmount = async (req, res) => {
       accountId: account.id,
       recipient: account.name,
       category: TRANSACTION_CATEGORY.others,
+      balance: encryptedBalance,
     },
   });
-
-  const balance = creditCardModel.getRemainingBalance(body.amount);
 
   await prisma.balance.update({
     where: {
       id: creditCard.balanceId,
     },
     data: {
-      amount: new Encrypter().encrypt(balance.toString()),
+      amount: encryptedBalance,
     },
   });
 

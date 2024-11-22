@@ -1,7 +1,6 @@
 const { StatusCodes } = require("http-status-codes");
 
 const prisma = require("../../prisma/prisma-client");
-const { Prisma } = require("@prisma/client");
 const { CreditCard, generateTransactions } = require("../model");
 const retrieve = require("../retrieve-schema");
 const { NotFoundError, BadRequestError } = require("../error");
@@ -29,40 +28,31 @@ const addCreditCard = async (req, res) => {
     creditCardModel.setActive();
   }
 
-  await prisma.$transaction(
-    async (tx) => {
-      if (creditCardModel.model.isSelected) {
-        await tx.card.updateMany({
-          where: { isSelected: true, userId: id },
-          data: { isSelected: false },
-        });
-      }
+  if (creditCardModel.model.isSelected) {
+    await prisma.card.updateMany({
+      where: { isSelected: true, userId: id },
+      data: { isSelected: false },
+    });
+  }
 
-      const creditCard = await tx.card.create({
-        data: creditCardModel.model,
-      });
+  const creditCard = await prisma.card.create({
+    data: creditCardModel.model,
+  });
 
-      const transactions = generateTransactions(creditCard.id);
+  const transactions = generateTransactions(creditCard.id);
 
-      await tx.transaction.createMany({
-        data: transactions,
-      });
+  await prisma.transaction.createMany({
+    data: transactions,
+  });
 
-      await tx.balance.update({
-        where: {
-          id: creditCard.balanceId,
-        },
-        data: {
-          amount: transactions[transactions.length - 1].balance,
-        },
-      });
+  await prisma.balance.update({
+    where: {
+      id: creditCard.balanceId,
     },
-    {
-      timeout: 120000,
-      maxWait: 120000,
-      isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
-    }
-  );
+    data: {
+      amount: transactions[transactions.length - 1].balance,
+    },
+  });
 
   res.status(StatusCodes.CREATED).json({
     msg: "Credit card added successfully",
