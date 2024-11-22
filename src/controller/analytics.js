@@ -85,20 +85,20 @@ const getBalanceHistory = async (req, res) => {
   }
 
   const transactions = await prisma.$queryRaw`
-  WITH MonthlyTransactions AS (
+  WITH WeeklyTransactions AS (
     SELECT 
       *,
       ROW_NUMBER() OVER (
-        PARTITION BY DATE_TRUNC('month', "createdAt") 
+        PARTITION BY DATE_TRUNC('week', "createdAt") 
         ORDER BY "createdAt" DESC
       ) AS rank
     FROM "Transaction"
     WHERE 
-      "createdAt" >= NOW() - INTERVAL '6 months' 
+      "createdAt" >= NOW() - INTERVAL '8 weeks' 
       AND "cardId" = ${creditCard.id}
   )
   SELECT * 
-  FROM MonthlyTransactions
+  FROM WeeklyTransactions
   WHERE rank = 1;
 `;
 
