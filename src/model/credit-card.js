@@ -6,8 +6,6 @@ const {
   TRANSACTION_METHOD_LIST,
   TRANSACTION_CATEGORY_LIST,
   TRANSACTION_METHOD,
-  getIncrementingShuffledDays,
-  MAX_TRANSACTIONS_PER_MONTH,
   STARTING_BALANCE,
   generateRandomAmount,
   getRandomNumber,
@@ -103,69 +101,34 @@ class CreditCard {
 
 const generateTransactions = (cardId) => {
   const currentDate = new Date();
-  const startDate = new Date();
+  const startDate = new Date(currentDate);
   startDate.setMonth(currentDate.getMonth() - 5);
+  startDate.setDate(1);
+  startDate.setHours(0, 0, 0, 0);
 
-  let transactions = [];
+  const endDate = new Date(currentDate);
+  endDate.setHours(currentDate.getHours() - 2, 0, 0, 0);
 
-  for (let month = 0; month < 6; month++) {
-    const monthStartDate = new Date(startDate);
-    monthStartDate.setMonth(startDate.getMonth() + month);
-    monthStartDate.setDate(1);
-
-    let monthEndDate = new Date(monthStartDate);
-    monthEndDate.setMonth(monthStartDate.getMonth() + 1);
-    monthEndDate.setDate(0);
-
-    if (month === 5) {
-      monthEndDate = new Date(currentDate);
-      monthEndDate.setHours(currentDate.getHours() - 2);
-      monthEndDate.setMinutes(0);
-      monthEndDate.setSeconds(0);
-      monthEndDate.setMilliseconds(0);
-    }
-
-    const monthTransaction = generateTransactionForMonth({
-      monthStartDate,
-      monthEndDate,
-      cardId,
-    });
-
-    transactions.push(...monthTransaction);
-  }
-
-  return transactions;
+  return generateTransactionForPeriod(startDate, endDate, cardId);
 };
 
-const generateTransactionForMonth = ({
-  monthStartDate,
-  monthEndDate,
-  cardId,
-}) => {
+const generateTransactionForPeriod = (startDate, endDate, cardId) => {
   let currentBalance = STARTING_BALANCE;
   let transactions = [];
-  let daysInMonth = [];
-  let currentDate = new Date(monthStartDate);
+  let currentDate = new Date(startDate);
 
-  while (currentDate <= monthEndDate) {
-    daysInMonth.push(new Date(currentDate));
-    currentDate.setDate(currentDate.getDate() + 1);
-  }
+  while (currentDate <= endDate) {
+    const dailyTransactions = getRandomNumber(1, 3);
+    const transactionDate = new Date(currentDate);
 
-  let selectedDays = getIncrementingShuffledDays(
-    daysInMonth,
-    MAX_TRANSACTIONS_PER_MONTH
-  );
+    for (let i = 0; i < dailyTransactions; i++) {
+      transactionDate.setHours(
+        getRandomNumber(0, 23),
+        getRandomNumber(0, 59),
+        0,
+        0
+      );
 
-  for (let i = 0; i < selectedDays.length; i++) {
-    const date = new Date(selectedDays[i]);
-    date.setHours(date.getHours() + Math.floor(Math.random() * 5) + 1);
-    date.setMinutes(date.getMinutes() + Math.floor(Math.random() * 60));
-
-    const transactionLimit = getRandomNumber(2, 5);
-
-    for (let j = 0; j < transactionLimit; j++) {
-      let fallbackBalance = currentBalance;
       const method =
         TRANSACTION_METHOD_LIST[
           Math.floor(Math.random() * TRANSACTION_METHOD_LIST.length)
@@ -174,15 +137,14 @@ const generateTransactionForMonth = ({
         TRANSACTION_CATEGORY_LIST[
           Math.floor(Math.random() * TRANSACTION_CATEGORY_LIST.length)
         ];
-
       const amount = generateRandomAmount(500, 2000, 2);
 
       if (method === TRANSACTION_METHOD.credit) {
-        currentBalance = currentBalance + parseFloat(amount);
+        currentBalance += parseFloat(amount);
+      } else {
+        currentBalance -= parseFloat(amount);
       }
-      if (method === TRANSACTION_METHOD.debit) {
-        currentBalance = currentBalance - parseFloat(amount);
-      }
+
       if (currentBalance <= STARTING_BALANCE && currentBalance >= 0) {
         transactions.push({
           method,
@@ -194,14 +156,17 @@ const generateTransactionForMonth = ({
           recipient: faker.finance.accountName(),
           note: faker.finance.transactionDescription(),
           category,
-          createdAt: date.toISOString(),
+          createdAt: transactionDate.toISOString(),
         });
-        date.setHours(date.getHours() + Math.floor(Math.random() * 5) + 1);
-        date.setMinutes(date.getMinutes() + Math.floor(Math.random() * 60));
       } else {
-        currentBalance = fallbackBalance;
+        currentBalance +=
+          method === TRANSACTION_METHOD.credit
+            ? -parseFloat(amount)
+            : parseFloat(amount);
       }
     }
+
+    currentDate.setDate(currentDate.getDate() + 1);
   }
 
   return transactions;
