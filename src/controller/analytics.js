@@ -23,8 +23,8 @@ const getWeeklyActivity = async (req, res) => {
     )
     SELECT 
       TO_CHAR(day, 'YYYY-MM-DD') AS day,
-      COALESCE(SUM(CASE WHEN method = 'DEBIT' THEN amount ELSE 0 END), 0) AS debit,
-      COALESCE(SUM(CASE WHEN method = 'CREDIT' THEN amount ELSE 0 END), 0) AS credit
+      ROUND(COALESCE(SUM(CASE WHEN method = 'DEBIT' THEN amount ELSE 0 END), 0), 2) AS debit,
+      ROUND(COALESCE(SUM(CASE WHEN method = 'CREDIT' THEN amount ELSE 0 END), 0), 2) AS credit
     FROM 
       last_seven_days
     LEFT JOIN "Transaction" 
@@ -105,7 +105,9 @@ const getBalanceHistory = async (req, res) => {
   const balance = transactions.map((transaction) => {
     return {
       date: transaction.createdAt,
-      balance: new Encrypter().decrypt(transaction.balance),
+      balance: parseFloat(new Encrypter().decrypt(transaction.balance)).toFixed(
+        2
+      ),
     };
   });
 
