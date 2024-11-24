@@ -1,6 +1,9 @@
 const cors = require("cors");
 
-const whitelist = [process.env.FRONT_END_ORIGIN];
+const whitelist = [
+  process.env.FRONT_END_ORIGIN,
+  process.env.LOCAL_FRONT_END_ORIGIN,
+];
 
 const corsOptionsDelegate = function (req, callback) {
   let corsOptions;
