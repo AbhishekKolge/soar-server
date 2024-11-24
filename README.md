@@ -120,7 +120,7 @@ pnpm run start
 npm run start
 ```
 
-### 6. Seed the database (Optional)
+### 6. Seed the data for countries and banks
 
 ```bash
 pnpm run seed
