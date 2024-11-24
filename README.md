@@ -134,23 +134,9 @@ pnpm run seed
 View the detailed user flow diagram here:
 [User Flow Diagram](https://app.eraser.io/workspace/2nWABkioYzntAg8KWpXi?origin=share)
 
-This diagram illustrates:
-- Authentication flow (Registration/Login)
-- Dashboard operations
-- Card and account management workflows
-- Transaction processes
-- Analytics features
-
 #### Database Design Diagram
 View the complete database design here:
 [Database Design Diagram](https://app.eraser.io/workspace/WSpKHr0oA2YXewPsdLHG?origin=share)
-
-This diagram shows:
-- Entity relationships
-- Table structures
-- Data flow connections
-- Key constraints and relationships
-- Complete system architecture
 
 ## API Documentation
 
