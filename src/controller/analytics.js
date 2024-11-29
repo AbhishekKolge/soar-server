@@ -16,7 +16,7 @@ const getWeeklyActivity = async (req, res) => {
     throw new NotFoundError("No active credit card found.");
   }
 
-  const activity = await prisma.$queryRaw`
+  const transactions = await prisma.$queryRaw`
     WITH last_seven_days AS (
       SELECT CURRENT_DATE - INTERVAL '1 day' * s.i AS day
       FROM generate_series(0, 6) AS s(i)
@@ -36,6 +36,14 @@ const getWeeklyActivity = async (req, res) => {
       day ASC;
   `;
 
+  const activity = transactions.map((transaction) => {
+    return {
+      ...transaction,
+      debit: +transaction.debit,
+      credit: +transaction.credit,
+    };
+  });
+
   res.status(StatusCodes.OK).json({ activity });
 };
 
@@ -53,10 +61,10 @@ const getExpenseStatistics = async (req, res) => {
     throw new NotFoundError("No active credit card found.");
   }
 
-  const statistics = await prisma.$queryRaw`
+  const expenses = await prisma.$queryRaw`
   SELECT 
     category,
-    (COUNT(*) * 100.0 / (SELECT COUNT(*) FROM "Transaction" WHERE "cardId" = ${creditCard.id})) AS percentage
+    ROUND((COUNT(*) * 100.0 / (SELECT COUNT(*) FROM "Transaction" WHERE "cardId" = ${creditCard.id})), 2) AS percentage
   FROM 
     "Transaction"
   WHERE
@@ -66,6 +74,13 @@ const getExpenseStatistics = async (req, res) => {
   ORDER BY 
     percentage DESC;
 `;
+
+  const statistics = expenses.map((expense) => {
+    return {
+      ...expense,
+      percentage: +expense.percentage,
+    };
+  });
 
   res.status(StatusCodes.OK).json({ statistics });
 };
@@ -105,9 +120,9 @@ const getBalanceHistory = async (req, res) => {
   const balance = transactions.map((transaction) => {
     return {
       date: transaction.createdAt,
-      balance: parseFloat(new Encrypter().decrypt(transaction.balance)).toFixed(
-        2
-      ),
+      balance: +parseFloat(
+        new Encrypter().decrypt(transaction.balance)
+      ).toFixed(2),
     };
   });
 
